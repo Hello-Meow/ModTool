@@ -1,0 +1,593 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool</name>
+    </assembly>
+    <members>
+        <member name="T:ModTool.AndroidAssemblyHelper">
+            <summary>
+            A class for extracting Assemblies from the game's APK.
+            </summary>
+        </member>
+        <member name="M:ModTool.AndroidAssemblyHelper.CopyAssemblies">
+            <summary>
+            Copy the game's Assemblies from the APK to the game's persistent datapath.
+            </summary>
+        </member>
+        <member name="T:ModTool.Dispatcher">
+            <summary>
+            Singleton Component for dispatching Coroutines and Actions on the main Thread.
+            </summary>
+        </member>
+        <member name="M:ModTool.Dispatcher.Enqueue(System.Collections.IEnumerator)">
+            <summary>
+            Enqueue a Coroutine.
+            </summary>
+            <param name="routine"></param>
+        </member>
+        <member name="M:ModTool.Dispatcher.Enqueue(System.Action,System.Boolean)">
+            <summary>
+            Enqueue an action on the main Thread.
+            </summary>
+            <param name="action"></param>
+            <param name="delayCall"></param>
+        </member>
+        <member name="T:ModTool.ResourceLoadState">
+            <summary>
+            Represents a load state.
+            </summary>
+        </member>
+        <member name="T:ModTool.Resource">
+            <summary>
+            A class that supports async loading of various resources.
+            </summary>
+        </member>
+        <member name="E:ModTool.Resource.Loaded">
+            <summary>
+            Occurs when this Resource has been loaded.
+            </summary>
+        </member>
+        <member name="E:ModTool.Resource.Unloaded">
+            <summary>
+            Occurs when this Resource has been unloaded.
+            </summary>
+        </member>
+        <member name="E:ModTool.Resource.LoadCancelled">
+            <summary>
+            Occurs when this Resource's async loading has been cancelled.
+            </summary>
+        </member>
+        <member name="E:ModTool.Resource.LoadResumed">
+            <summary>
+            Occurs when this Resources async loading has been resumed.
+            </summary>
+        </member>
+        <member name="E:ModTool.Resource.LoadProgress">
+            <summary>
+            Occurs when this Resource's loadProgress changes.
+            </summary>
+        </member>
+        <member name="P:ModTool.Resource.name">
+            <summary>
+            This Resource's name.
+            </summary>
+        </member>
+        <member name="P:ModTool.Resource.isBusy">
+            <summary>
+            Is this Resource busy loading?
+            </summary>
+        </member>
+        <member name="P:ModTool.Resource.canLoad">
+            <summary>
+            Can this Resource be loaded?
+            </summary>
+        </member>
+        <member name="P:ModTool.Resource.loadState">
+            <summary>
+            This Resource's current load state.
+            </summary>
+        </member>
+        <member name="P:ModTool.Resource.loadProgress">
+            <summary>
+            What is the Resource's load progress.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.#ctor(System.String)">
+            <summary>
+            Initialize a Resource with a name.
+            </summary>
+            <param name="name">The Resource's name</param>
+        </member>
+        <member name="M:ModTool.Resource.Load">
+            <summary>
+            Load this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.LoadAsync">
+            <summary>
+            Load this Resource asynchronously.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.LoadCoroutine">
+            <summary>
+            Coroutine that loads this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.LoadAsyncCoroutine">
+            <summary>
+            Coroutine that loads this Resource asynchronously.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.Unload">
+            <summary>
+            Unload this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.End">
+            <summary>
+            Finalize the current LoadState.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.PreUnLoadResources">
+            <summary>
+            Use this to implement anything that should happen before unloading this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.UnloadResources">
+            <summary>
+            Use this to implement unloading this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.LoadResources">
+            <summary>
+            Use this to implement loading this Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.LoadResourcesAsync">
+            <summary>
+            Use this to implement loading this Resource asynchronously.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.OnLoaded">
+            <summary>
+            Handle end of loading.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.OnUnloaded">
+            <summary>
+            Handle end of unloading.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.OnLoadCancelled">
+            <summary>
+            Handle load cancelling.
+            </summary>
+        </member>
+        <member name="M:ModTool.Resource.OnLoadResumed">
+            <summary>
+            Handle load resuming.
+            </summary>
+        </member>
+        <member name="T:ModTool.ModManager">
+            <summary> 
+            Main class for finding mods
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModsChanged">
+            <summary>
+            Occurs when the collection of Mods has changed.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModFound">
+            <summary>
+            Occurs when a Mod has been found.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModRemoved">
+            <summary>
+            Occurs when a Mod has been removed. The Mod will be marked invalid.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModLoaded">
+            <summary>
+            Occurs when a Mod has been loaded
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModUnloaded">
+            <summary>
+            Occurs when a Mod has been Unloaded
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.ModLoadCancelled">
+            <summary>
+            Occurs when a Mod has cancelled async loading
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.SceneLoaded">
+            <summary>
+            Occurs when a ModScene has been loaded
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.SceneUnloaded">
+            <summary>
+            Occurs when a ModScene has been unloaded
+            </summary>
+        </member>
+        <member name="E:ModTool.ModManager.SceneLoadCancelled">
+            <summary>
+            Occurs when a ModScene has cancelled async loading
+            </summary>
+        </member>
+        <member name="P:ModTool.ModManager.defaultSearchDirectory">
+            <summary>
+            Default directory that will be searched for mods.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModManager.refreshInterval">
+            <summary>
+            The interval (in seconds) between refreshing Mod search directories. 
+            Set to 0 to disable auto refreshing.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModManager.mods">
+            <summary>
+            All mods that have been found in all search directories.
+            </summary>
+        </member>
+        <member name="M:ModTool.ModManager.AddSearchDirectory(System.String)">
+            <summary>
+            Add a directory that will be searched for Mods
+            </summary>
+            <param name="path">The path of the search directory.</param>
+        </member>
+        <member name="M:ModTool.ModManager.RemoveSearchDirectory(System.String)">
+            <summary>
+            Remove a directory that will be searched for mods
+            </summary>
+            <param name="path">The path of the search directory.</param>
+        </member>
+        <member name="M:ModTool.ModManager.RefreshSearchDirectories">
+            <summary>
+            Refresh all search directories and update any new, changed or removed Mods.
+            </summary>
+        </member>
+        <member name="T:ModTool.ModSearchDirectory">
+            <summary>
+            Represents a directory that is monitored for Mods.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModSearchDirectory.ModFound">
+            <summary>
+            Occurs when a new Mod has been found.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModSearchDirectory.ModRemoved">
+            <summary>
+            Occurs when a Mod has been removed.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModSearchDirectory.ModChanged">
+            <summary>
+            Occurs when a change to a Mod's directory has been detected.
+            </summary>
+        </member>
+        <member name="E:ModTool.ModSearchDirectory.ModsChanged">
+            <summary>
+            Occurs when any change was detected for any Mod in this search directory.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModSearchDirectory.path">
+            <summary>
+            This ModSearchDirectory's path.
+            </summary>
+        </member>
+        <member name="M:ModTool.ModSearchDirectory.#ctor(System.String)">
+            <summary>
+            Initialize a new ModSearchDirectory with a path.
+            </summary>
+            <param name="path">The path to the search directory.</param>
+        </member>
+        <member name="M:ModTool.ModSearchDirectory.Refresh">
+            <summary>
+            Refresh the collection of mod paths. Remove all missing paths and add all new paths.
+            </summary>
+        </member>
+        <member name="M:ModTool.ModSearchDirectory.Dispose">
+            <summary>
+            Releases all resources used by the ModSearchDirectory.
+            </summary>
+        </member>
+        <member name="T:ModTool.Mod">
+            <summary>
+            Class that represents a Mod. 
+            A Mod lets you load scenes, prefabs and Assemblies that have been exported with the game's generated ModTools.
+            </summary>
+        </member>
+        <member name="E:ModTool.Mod.SceneLoaded">
+            <summary>
+            Occurs when a ModScene has been loaded
+            </summary>
+        </member>
+        <member name="E:ModTool.Mod.SceneUnloaded">
+            <summary>
+            Occurs when a ModScene has been unloaded
+            </summary>
+        </member>
+        <member name="E:ModTool.Mod.SceneLoadCancelled">
+            <summary>
+            Occurs when a ModScene has cancelled async loading.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.assemblyNames">
+            <summary>
+            Collection of names of Assemblies included in this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.conflictingMods">
+            <summary>
+            Collection of Mods that are in conflict with this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.sceneNames">
+            <summary>
+            Collection of names of Scenes included in this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.assetPaths">
+            <summary>
+            Collection of paths of assets included in this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.scenes">
+            <summary>
+            Collection of ModScenes included in this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.prefabs">
+            <summary>
+            Collection of loaded prefabs included in this Mod. Only available when the mod is loaded.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.modInfo">
+            <summary>
+            This mod's ModInfo.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.contentType">
+            <summary>
+            Types of content included in this Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.isBusy">
+            <summary>
+            Is this Mod or any of its resources currently busy loading?
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.canLoad">
+            <summary>
+            Can this mod be loaded? False if a conflicting mod is loaded, if the mod is not enabled or if the mod is not valid
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.isEnabled">
+            <summary>
+            Set the mod to be enabled or disabled
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.isValid">
+            <summary>
+            Is the mod valid? A Mod becomes invalid when it is no longer being managed by the ModManager,
+            when any of its resources is missing or can't be loaded.
+            </summary>
+        </member>
+        <member name="P:ModTool.Mod.contentHandler">
+            <summary>
+            The Mod's ContentHandler. Use for instantiating Objects and adding Components that have to be initialized for this mod, 
+            or cleaned up after the mod is unloaded.
+            </summary>
+        </member>
+        <member name="M:ModTool.Mod.#ctor(System.String)">
+            <summary>
+            Initialize a new Mod with a path to a mod file.
+            </summary>
+            <param name="path">The path to a mod file</param>
+        </member>
+        <member name="M:ModTool.Mod.UpdateConflicts(ModTool.Mod)">
+            <summary>
+            Update this Mod's conflicting Mods with the supplied Mod
+            </summary>
+            <param name="other">Another Mod</param>
+        </member>
+        <member name="M:ModTool.Mod.UpdateConflicts(System.Collections.Generic.IEnumerable{ModTool.Mod})">
+            <summary>
+            Update this Mod's conflicting Mods with the supplied Mods
+            </summary>
+            <param name="mods">A collection of Mods</param>
+        </member>
+        <member name="M:ModTool.Mod.ConflictingModsLoaded">
+            <summary>
+            Is another conflicting Mod loaded?
+            </summary>
+            <returns>True if another conflicting mod is loaded</returns>
+        </member>
+        <member name="M:ModTool.Mod.ConflictingModsEnabled">
+            <summary>
+            Is another conflicting Mod enabled?
+            </summary>
+            <returns>True if another conflicting mod is enabled</returns>
+        </member>
+        <member name="M:ModTool.Mod.SetInvalid">
+            <summary>
+            Invalidate the mod
+            </summary>
+        </member>
+        <member name="M:ModTool.Mod.GetAsset(System.String)">
+            <summary>
+            Get an asset with name.
+            </summary>
+            <param name="name">The asset's name.</param>
+            <returns>The asset if it has been found. Null otherwise</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetAsset``1(System.String)">
+            <summary>
+            Get an asset with name of a certain Type.
+            </summary>
+            <param name="name">The asset's name.</param>
+            <typeparam name="T">The asset Type.</typeparam>
+            <returns>The asset if it has been found. Null otherwise</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetAssets``1">
+            <summary>
+            Get all assets of a certain Type.
+            </summary>
+            <typeparam name="T">The asset Type.</typeparam>
+            <returns>AssetBundleRequest that can be used to get the asset.</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetAssetAsync``1(System.String)">
+            <summary>
+            Get an asset with name of a certain Type.
+            </summary>
+            <param name="name">The asset's name.</param>
+            <typeparam name="T">The asset's Type</typeparam>
+            <returns>AssetBundleRequest that can be used to get the asset.</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetAssetsAsync``1">
+            <summary>
+            Get all assets of a certain Type.
+            </summary>
+            <typeparam name="T">The asset Type.</typeparam>
+            <returns>AssetBundleRequest that can be used to get the assets.</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetComponentsInPrefabs``1">
+            <summary>
+            Get all Components of type T in all prefabs
+            </summary>
+            <typeparam name="T">The Component that will be looked for.</typeparam>
+            <returns>An array of found Components of Type T.</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetComponentsInScenes``1">
+            <summary>
+            Get all Components of type T in all loaded ModScenes.
+            </summary>
+            <typeparam name="T">The Component that will be looked for.</typeparam>
+            <returns>An array of found Components of Type T.</returns>
+        </member>
+        <member name="M:ModTool.Mod.GetInstances``1(System.Object[])">
+            <summary>
+            Get instances of all Types included in the Mod that implement or derive from Type T.
+            Reuses existing instances and creates new instances for Types that have no instance yet.
+            Does not instantiate Components; returns all active instances of the Component instead.
+            </summary>
+            <typeparam name="T">The Type that will be looked for</typeparam>
+            <param name="args">Optional arguments for the Type's constructor</param>
+            <returns>A List of Instances of Types that implement or derive from Type T</returns>
+        </member>
+        <member name="T:ModTool.ModScene">
+            <summary>
+            Represents a Scene that is included in a Mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModScene.scene">
+            <summary>
+            This ModScene's Scene.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModScene.mod">
+            <summary>
+            The Mod this scene belongs to.
+            </summary>
+        </member>
+        <member name="P:ModTool.ModScene.canLoad">
+            <summary>
+            Can the scene be loaded? False if this scene's Mod is not loaded.
+            </summary>
+        </member>
+        <member name="M:ModTool.ModScene.#ctor(System.String,ModTool.Mod)">
+            <summary>
+            Initialize a new ModScene with a Scene name and a Mod
+            </summary>
+            <param name="name">The scene's name</param>
+            <param name="mod">The Mod this ModScene belongs to.</param>
+        </member>
+        <member name="M:ModTool.ModScene.SetActive">
+            <summary>
+            Set this ModScene's Scene as the active scene.
+            </summary>
+        </member>
+        <member name="M:ModTool.ModScene.GetComponentInScene``1">
+            <summary>
+            Returns the first Component of type T in this Scene.
+            </summary>
+            <typeparam name="T">The Component that will be looked for.</typeparam>
+            <returns>An array of found Components of Type T.</returns>
+        </member>
+        <member name="M:ModTool.ModScene.GetComponentsInScene``1">
+            <summary>
+            Returns all Components of type T in this Scene.
+            </summary>
+            <typeparam name="T">The Component that will be looked for.</typeparam>
+            <returns>An array of found Components of Type T.</returns>
+        </member>
+        <member name="T:ModTool.SceneExtensions">
+            <summary>
+            Extensions for the Scene class.
+            </summary>
+        </member>
+        <member name="M:ModTool.SceneExtensions.Unload(UnityEngine.SceneManagement.Scene)">
+            <summary>
+            Unload this Scene.
+            </summary>
+            <param name="self">A Scene instance.</param>
+        </member>
+        <member name="M:ModTool.SceneExtensions.GetComponentInScene``1(UnityEngine.SceneManagement.Scene)">
+            <summary>
+            Get a Component of Type T in this Scene. Returns the first found Component.
+            </summary>
+            <typeparam name="T">A Type that derives from Component</typeparam>
+            <param name="self">A Scene instance.</param>
+            <returns>A Component of Type T or null if none is found.</returns>
+        </member>
+        <member name="M:ModTool.SceneExtensions.GetComponentInScene(UnityEngine.SceneManagement.Scene,System.Type)">
+            <summary>
+            Get a Component of Type componentType in this Scene. Returns the first found Component.
+            </summary>
+            <param name="self">A Scene instance.</param>
+            <param name="componentType">The Component Type to look for</param>
+            <returns>A component of Type componentType or null if none is found.</returns>
+        </member>
+        <member name="M:ModTool.SceneExtensions.GetComponentsInScene``1(UnityEngine.SceneManagement.Scene)">
+            <summary>
+            Get all components of Type T in this Scene.
+            </summary>
+            <typeparam name="T">A Type that derives from Component.</typeparam>
+            <param name="self">A Scene instance.</param>
+            <returns>An array of found Components of Type T.</returns>
+        </member>
+        <member name="M:ModTool.SceneExtensions.GetComponentsInScene(UnityEngine.SceneManagement.Scene,System.Type)">
+            <summary>
+            Get all Components of type componentType in this Scene.
+            </summary>
+            <param name="self">A Scene Instance.</param>
+            <param name="componentType">A Type that derives from Component.</param>
+            <returns>An array of found Components of Type componentType.</returns>
+        </member>
+        <member name="M:ModTool.SceneExtensions.Instantiate(UnityEngine.SceneManagement.Scene,UnityEngine.GameObject)">
+            <summary>
+            Instantiate a GameObject and place it in this Scene.
+            </summary>
+            <param name="self">A Scene instance.</param>
+            <param name="original">An existing object that you want to make a copy of.</param>
+            <returns>The instantiated GameObject.</returns>
+        </member>
+        <member name="T:ModTool.UnitySingleton`1">
+            <summary>
+            A generic singleton class for MonoBehaviours
+            </summary>
+            <typeparam name="T">The singleton's Type.</typeparam>
+        </member>
+        <member name="P:ModTool.UnitySingleton`1.instance">
+            <summary>
+            Singleton instance.
+            </summary>
+        </member>
+    </members>
+</doc>

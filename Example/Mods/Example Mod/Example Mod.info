@@ -1,0 +1,10 @@
+{
+    "_name": "Example Mod",
+    "_author": "",
+    "_description": "",
+    "_version": "",
+    "_unityVersion": "5.3.1p1",
+    "_platforms": 1,
+    "_content": 5,
+    "_isEnabled": true
+}

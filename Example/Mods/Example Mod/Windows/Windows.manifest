@@ -1,0 +1,6 @@
+ManifestFileVersion: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: example mod.scenes
+      Dependencies: {}

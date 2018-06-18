@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool.Shared.Editor</name>
+    </assembly>
+    <members>
+        <member name="T:ModTool.Shared.Editor.AssetUtility">
+            <summary>
+            A set of utilities for handling assets.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Editor.AssetUtility.GetModToolDirectory">
+            <summary>
+            Finds and returns the directory where ModTool is located.
+            </summary>
+            <returns>The directory where ModTool is located.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Editor.AssetUtility.GetRelativePath(System.String)">
+            <summary>
+            Get the relative path for an absolute path.
+            </summary>
+            <param name="path">The absolute path.</param>
+            <returns>The relative path.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Editor.AssetUtility.GetAssets(System.String)">
+            <summary>
+            Get all asset paths for assets that match the filter.
+            </summary>
+            <param name="filter">The filter string can contain search data for: names, asset labels and types (class names).</param>
+            <returns>A list of asset paths</returns>
+        </member>
+        <member name="M:ModTool.Shared.Editor.AssetUtility.MoveAssets(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Move assets to a directory.
+            </summary>
+            <param name="assetPaths">A list of asset paths</param>
+            <param name="targetDirectory">The directory to move all assets to.</param>
+        </member>
+        <member name="M:ModTool.Shared.Editor.AssetUtility.CreateAsset(UnityEngine.ScriptableObject)">
+            <summary>
+            Create an asset for a ScriptableObject in a ModTool Resources directory.
+            </summary>
+            <param name="scriptableObject">A ScriptableObject instance.</param>
+        </member>
+    </members>
+</doc>

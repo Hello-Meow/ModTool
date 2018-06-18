@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool.Exporting.Editor</name>
+    </assembly>
+    <members>
+        <member name="T:ModTool.Exporting.Editor.EditorModPlatformExtensions">
+            <summary>
+            Extension methods for ModPlatform.
+            </summary>
+        </member>
+        <member name="M:ModTool.Exporting.Editor.EditorModPlatformExtensions.HasBuildTarget(ModTool.Shared.ModPlatform,UnityEditor.BuildTarget)">
+            <summary>
+            Does this ModPlatform include the equivalent BuildTarget?
+            </summary>
+            <param name="self">A ModPlatform instance.</param>
+            <param name="buildTarget">The BuildTarget to check.</param>
+            <returns>True if the ModPlatform has the BuildTarget.</returns>
+        </member>
+        <member name="M:ModTool.Exporting.Editor.EditorModPlatformExtensions.GetModPlatform(UnityEditor.BuildTarget)">
+            <summary>
+            Get the ModPlatform equivalent to this BuildTarget
+            </summary>
+            <param name="self">A BuildTarget instance.</param>
+            <returns>The equivalent ModPlatform.</returns>
+        </member>
+        <member name="M:ModTool.Exporting.Editor.EditorModPlatformExtensions.GetBuildTargets(ModTool.Shared.ModPlatform)">
+            <summary>
+            Get a list of BuildTargets that are equivalent to this ModPlatform.
+            </summary>
+            <param name="self">A ModPlatform Instance.</param>
+            <returns>A list with equivalent BuildTargets</returns>
+        </member>
+        <member name="T:ModTool.Exporting.Editor.ExportData">
+            <summary>
+            Class that stores data during the exporting process.
+            </summary>
+        </member>
+        <member name="T:ModTool.Exporting.Editor.ExportSettings">
+            <summary>
+            Stores the exporter's settings.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.name">
+            <summary>
+            The Mod's name.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.author">
+            <summary>
+            The Mod's author.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.description">
+            <summary>
+            The Mod's description.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.version">
+            <summary>
+            The Mod's version.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.platforms">
+            <summary>
+            The selected platforms for which this mod will be exported.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.content">
+            <summary>
+            The selected content types that will be exported.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ExportSettings.outputDirectory">
+            <summary>
+            The directory to which the Mod will be exported.
+            </summary>
+        </member>
+        <member name="T:ModTool.Exporting.Editor.ModExporter">
+            <summary>
+            Main class for exporting a project as a mod.
+            </summary>
+        </member>
+        <member name="E:ModTool.Exporting.Editor.ModExporter.ExportStarting">
+            <summary>
+            Occurs when the export process is starting.
+            </summary>
+        </member>
+        <member name="P:ModTool.Exporting.Editor.ModExporter.isExporting">
+            <summary>
+            Is this ModExporter currently exporting a Mod?
+            </summary>
+        </member>
+        <member name="M:ModTool.Exporting.Editor.ModExporter.ExportMod(ModTool.Exporting.Editor.ExportSettings)">
+            <summary>
+            Start exporting a Mod.
+            </summary>
+            <param name="settings">The settings to use for exporting the Mod.</param>
+        </member>
+        <member name="T:ModTool.Exporting.Editor.ModSurrogate">
+            <summary>
+            A class that substitutes a Mod while testing the Mod in play-mode.
+            </summary>
+        </member>
+        <member name="T:ModTool.Exporting.Editor.ModSceneSurrogate">
+            <summary>
+            A class that substitutes a ModScene while testing the Mod in play mode.
+            </summary>
+        </member>
+    </members>
+</doc>

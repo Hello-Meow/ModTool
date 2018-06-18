@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool.Shared</name>
+    </assembly>
+    <members>
+        <member name="T:ModTool.Shared.CodeSettings">
+            <summary>
+            Stores settings related to the game's API and code verification.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.CodeSettings.inheritanceRestrictions">
+            <summary>
+            Restrictions related to inheritance of Types inside Mod Assemblies.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.CodeSettings.memberRestrictions">
+            <summary>
+            Restrictions related to the use of fields, properties and methods from other types.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.CodeSettings.typeRestrictions">
+            <summary>
+            Restrictions related to the use of Types for fields and properties.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.CodeSettings.namespaceRestrictions">
+            <summary>
+            Restrictions related to the use of entire namespaces.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.CodeSettings.apiAssemblies">
+            <summary>
+            List of the Game's api Assembly names.
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.LogLevel">
+            <summary>
+            Filter level for logging messages to the console or log file.
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.LogUtility">
+            <summary>
+            A class for logging filtered messages.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.LogUtility.logLevel">
+            <summary>
+            Which level of messages to log.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.LogUtility.LogDebug(System.Object)">
+            <summary>
+            Log a debug message.
+            </summary>
+            <param name="message">The debug message.</param>
+        </member>
+        <member name="M:ModTool.Shared.LogUtility.LogInfo(System.Object)">
+            <summary>
+            Log a message.
+            </summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:ModTool.Shared.LogUtility.LogWarning(System.Object)">
+            <summary>
+            Log a warning.
+            </summary>
+            <param name="message">The warning message.</param>
+        </member>
+        <member name="M:ModTool.Shared.LogUtility.LogError(System.Object)">
+            <summary>
+            Log an error.
+            </summary>
+            <param name="message">The error message</param>
+        </member>
+        <member name="M:ModTool.Shared.LogUtility.LogException(System.Exception)">
+            <summary>
+            Log an exception.
+            </summary>
+            <param name="exception">The exception</param>
+        </member>
+        <member name="T:ModTool.Shared.EnumExtensions">
+            <summary>
+            Extension methods for enums.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.EnumExtensions.FixEnum(System.Enum)">
+            <summary>
+            Unity's enum mask fields set all bits to 1. This sets all unused bits to 0, so it can be converted to a string and serialized properly.
+            </summary>
+            <param name="self">An enum instance.</param>
+            <returns>A fixed enum.</returns>
+        </member>
+        <member name="T:ModTool.Shared.StringExtensions">
+            <summary>
+            Extension methods for strings.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.StringExtensions.IsDirectoryOrSubdirectory(System.String,System.String)">
+            <summary>
+            Is this path a sub directory or the same directory of another path?
+            </summary>
+            <param name="self">A string.</param>
+            <param name="other">A path.</param>
+            <returns>True if this string is a sub directory or the same directory as the other.</returns>
+        </member>
+        <member name="M:ModTool.Shared.StringExtensions.NormalizedPath(System.String)">
+            <summary>
+            Returns a normalized version of a path.
+            </summary>
+            <param name="self">A string.</param>
+            <returns>A normalized version of a path.</returns>
+        </member>
+        <member name="T:ModTool.Shared.CecilExtensions">
+            <summary>
+            Extension methods for Mono.Cecil.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.CecilExtensions.IsSubClassOf(Mono.Cecil.TypeDefinition,ModTool.Shared.Verification.TypeName)">
+            <summary>
+            Is this Type a subclass of the other Type?
+            </summary>
+            <param name="self">A TypeDefinition.</param>
+            <param name="other">A TypeDefinition.</param>
+            <returns>True if this TypeDefinition is a subclass of the other TypeDefinition.</returns>
+        </member>
+        <member name="M:ModTool.Shared.CecilExtensions.IsSubClassOf(Mono.Cecil.TypeDefinition,System.String,System.String)">
+            <summary>
+            Is this Type a subclass of the other Type?
+            </summary>
+            <param name="self">A TypeDefinition.</param>
+            <param name="namespace">A Type's namespace.</param>
+            <param name="name">A Type's name.</param>
+            <returns>True if this TypeDefinition is a subclass of the Type.</returns>
+        </member>
+        <member name="M:ModTool.Shared.CecilExtensions.GetMethod(Mono.Cecil.TypeDefinition,System.String)">
+            <summary>
+            Get the first method that matches with methodName.
+            </summary>
+            <param name="self">A TypeDefinition.</param>
+            <param name="methodName">A method's name</param>
+            <returns>The MethodDefinition for the method, if found. Null otherwise.</returns>
+        </member>
+        <member name="M:ModTool.Shared.CecilExtensions.GetField(Mono.Cecil.TypeDefinition,System.String)">
+            <summary>
+            Get the first field that matches with fieldName.
+            </summary>
+            <param name="self">A TypeDefinition.</param>
+            <param name="fieldName">The FieldDefinition for the field, if found. Null otherwise.</param>
+            <returns>The FieldDefinition, or null of none was found.</returns>
+        </member>
+        <member name="M:ModTool.Shared.CecilExtensions.GetProperty(Mono.Cecil.TypeDefinition,System.String)">
+            <summary>
+            Get the first property that matches with propertyName.
+            </summary>
+            <param name="self">A TypeDefinition.</param>
+            <param name="propertyName">The PropertyDefinition for the field, if found. Null otherwise.</param>
+            <returns>The PropertyDefinition, or null of none was found.</returns>
+        </member>
+        <member name="T:ModTool.Shared.Verification.MemberName">
+            <summary>
+            Represents a member's name.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.MemberName.type">
+            <summary>
+            The Type to which the member belongs.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.MemberName.name">
+            <summary>
+            The member's name.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.MemberName.#ctor(ModTool.Shared.Verification.TypeName,System.String)">
+            <summary>
+            Initialize a new MemberName.
+            </summary>
+            <param name="type">The Type to which the member belongs.</param>
+            <param name="name">The member's name.</param>
+        </member>
+        <member name="T:ModTool.Shared.Verification.AssemblyVerifier">
+            <summary>
+            A class for verifying Assembly files based on a number of Restrictions.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.AssemblyVerifier.VerifyAssemblies(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Verify a list of Assembly files. 
+            </summary>
+            <param name="assemblies">A collection of paths to Assemblies that will be verified.</param>
+            <returns>False if an assembly has failed.</returns>
+        </member>
+        <member name="T:ModTool.Shared.Verification.Restriction">
+            <summary>
+            Base class for restrictions. A restriction either requires or prohibits something.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.Restriction.message">
+            <summary>
+            The message to use when this restriction causes the verification to fail.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.Restriction.applicableBaseType">
+            <summary>
+            The base type to which the Restriction will be applied.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.Restriction.restrictionMode">
+            <summary>
+            Does the Restriction require or prohibit the use of something?
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.#ctor(ModTool.Shared.Verification.TypeName,System.String,ModTool.Shared.Verification.RestrictionMode)">
+            <summary>
+            Initialize a new Restriction.
+            </summary>
+            <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+            <param name="message">The Message that will be shown upon failing the Restriction.</param>
+            <param name="restrictionMode">Should it be required or prohibited?</param>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.Verify(Mono.Cecil.MemberReference,System.Collections.Generic.List{System.String})">
+            <summary>
+            Verify a member with this Restriction.
+            </summary>
+            <param name="member">A member.</param>
+            <param name="excludedAssemblies">A List of Assembly names that should be ignored.</param>
+            <returns>False if the Member fails the verification.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.Present(Mono.Cecil.MemberReference)">
+            <summary>
+            Is the Restriction present in the member?
+            </summary>
+            <param name="member">A member.</param>
+            <returns>True if the Restriction is present in the member.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.PresentMethodVariable(Mono.Cecil.Cil.VariableReference)">
+            <summary>
+            Is the restriction present in a local variable?
+            </summary>
+            <param name="variable">A local variable</param>
+            <returns>True if the restriction is present in the local variable.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.LogMessage(Mono.Cecil.MemberReference)">
+            <summary>
+            Log this Restriction's message.
+            </summary>
+            <param name="member">The Member to include in the message.</param>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.Applicable(Mono.Cecil.MemberReference)">
+            <summary>
+            Is this Restriction applicable to the member?
+            </summary>
+            <param name="member">A member.</param>
+            <returns>True if the Restriction is applicable.</returns>
+        </member>
+        <member name="M:ModTool.Shared.Verification.Restriction.Applicable(Mono.Cecil.TypeReference)">
+            <summary>
+            Is this Restriction applicable to the Type?
+            </summary>
+            <param name="type">A Type.</param>
+            <returns>True if the Restriction is applicable.</returns>
+        </member>
+        <member name="T:ModTool.Shared.Verification.NamespaceRestriction">
+            <summary>
+            A restriction that either requires or prohibits the use of a namespace.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.NamespaceRestriction.nameSpace">
+            <summary>
+            The namespace that will be checked for this restriction.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.NamespaceRestriction.includeNested">
+            <summary>
+            Should nested namespaces be restricted as well?
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.NamespaceRestriction.#ctor(System.String,System.Boolean,ModTool.Shared.Verification.TypeName,System.String,ModTool.Shared.Verification.RestrictionMode)">
+            <summary>
+            Initialize a new NamespaceRestriction
+            </summary>
+            <param name="nameSpace">The namespace that will be checked for this restriction.</param>
+            <param name="includeNested">Should nested namespaces be restricted as well?</param>
+            <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+            <param name="message">The Message that will be shown upon failing the Restriction.</param>
+            <param name="restrictionMode">Should it be required or prohibited?</param>
+        </member>
+        <member name="T:ModTool.Shared.Verification.TypeRestriction">
+            <summary>
+            A restriction that either requires or prohibits the use of a Type
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.TypeRestriction.type">
+            <summary>
+            The Type that will be checked for this Restriction.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.TypeRestriction.#ctor(ModTool.Shared.Verification.TypeName,ModTool.Shared.Verification.TypeName,System.String,ModTool.Shared.Verification.RestrictionMode)">
+            <summary>
+            Initialize a new TypeRestriction.
+            </summary>
+            <param name="type">The Type that will be checked for this Restriction.</param>
+            <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+            <param name="message">The Message that will be shown upon failing the Restriction.</param>
+            <param name="restrictionMode">Should it be required or prohibited?</param>
+        </member>
+        <member name="T:ModTool.Shared.Verification.InheritanceRestriction">
+            <summary>
+            A restriction that either requires or prohibits inheritance from a class
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.InheritanceRestriction.type">
+            <summary>
+            The Type that will be checked for this Restriction.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.InheritanceRestriction.#ctor(ModTool.Shared.Verification.TypeName,ModTool.Shared.Verification.TypeName,System.String,ModTool.Shared.Verification.RestrictionMode)">
+            <summary>
+            Initialize a new InheritanceRestriction.
+            </summary>
+            <param name="type">The Type that will be checked for this Restriction</param>
+            <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+            <param name="message">The Message that will be shown upon failing the Restriction.</param>
+            <param name="restrictionMode">Should it be required or prohibited?</param>
+        </member>
+        <member name="T:ModTool.Shared.Verification.RestrictionMode">
+            <summary>
+            Type for applying Restrictions.
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.Verification.MemberRestriction">
+            <summary>
+            A restriction that either requires or prohibits the use of a given Type's member
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.MemberRestriction.memberName">
+            <summary>
+            The member that will be checked for this Restriction.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.MemberRestriction.#ctor(ModTool.Shared.Verification.MemberName,ModTool.Shared.Verification.TypeName,System.String,ModTool.Shared.Verification.RestrictionMode)">
+            <summary>
+            Initialize a new MemberRestriction.
+            </summary>
+            <param name="memberName">The member that will be checked for this Restriction.</param>
+            <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+            <param name="message">The Message that will be shown upon failing the Restriction.</param>
+            <param name="restrictionMode">Should it be required or prohibited?</param>
+        </member>
+        <member name="T:ModTool.Shared.Verification.TypeName">
+            <summary>
+            Represents a Type's name.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.TypeName.nameSpace">
+            <summary>
+            The Type's namespace.
+            </summary>
+        </member>
+        <member name="F:ModTool.Shared.Verification.TypeName.name">
+            <summary>
+            The Type's name.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.Verification.TypeName.#ctor(System.String,System.String)">
+            <summary>
+            Initialize a new TypeName.
+            </summary>
+            <param name="nameSpace">The Type's namespace.</param>
+            <param name="name">The Type's name.</param>
+        </member>
+        <member name="T:ModTool.Shared.ModContent">
+            <summary>
+            Flags for different types of content that can be included in a Mod. 
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.ModInfo">
+            <summary>
+            Class that stores a Mod's name, author, description, version, path and supported platforms.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.platforms">
+            <summary>
+            Supported platforms for this mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.content">
+            <summary>
+            The Mod's available content types.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.author">
+            <summary>
+            Mod author.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.description">
+            <summary>
+            Mod description.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.version">
+            <summary>
+            Mod version.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.unityVersion">
+            <summary>
+            The version of Unity that was used to export this mod.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.isEnabled">
+            <summary>
+            Should this mod be enabled.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModInfo.path">
+            <summary>
+            Location of mod
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.ModInfo.#ctor(System.String,System.String,System.String,System.String,System.String,ModTool.Shared.ModPlatform,ModTool.Shared.ModContent)">
+            <summary>
+            Initialize a new ModInfo.
+            </summary>
+            <param name="name">The Mod's name.</param>
+            <param name="author">The Mod's author.</param>
+            <param name="description">The Mod's description.</param>
+            <param name="platforms">The Mod's supported platforms.</param>
+            <param name="content">The Mod's available content types.</param>
+            <param name="version">The Mod's version</param>
+            <param name="unityVersion"> The version of Unity that the Mod was exported with.</param>
+        </member>
+        <member name="M:ModTool.Shared.ModInfo.Save">
+            <summary>
+            Save this ModInfo.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.ModInfo.Save(System.String,ModTool.Shared.ModInfo)">
+            <summary>
+            Save a ModInfo.
+            </summary>
+            <param name="path">The path to save the ModInfo to.</param>
+            <param name="modInfo">The ModInfo to save.</param>
+        </member>
+        <member name="M:ModTool.Shared.ModInfo.Load(System.String)">
+            <summary>
+            Load a ModInfo.
+            </summary>
+            <param name="path">The path to load the ModInfo from.</param>
+            <returns>The loaded Modinfo, if succeeded. Null otherwise.</returns>
+        </member>
+        <member name="T:ModTool.Shared.ModPlatform">
+            <summary>
+            Represents a platform or a combination of platforms.
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.ModPlatformExtensions">
+            <summary>
+            Extension methods for ModPlatform.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.ModPlatformExtensions.HasRuntimePlatform(ModTool.Shared.ModPlatform,UnityEngine.RuntimePlatform)">
+            <summary>
+            Does this ModPlatform include the equivalent RuntimePlatform?
+            </summary>
+            <param name="self">A ModPlatform instance.</param>
+            <param name="runtimePlatform">A RuntimePlatform.</param>
+            <returns>True if the ModPlatform includes the equivalent RuntimePlatform.</returns>
+        </member>
+        <member name="M:ModTool.Shared.ModPlatformExtensions.GetModPlatform(UnityEngine.RuntimePlatform)">
+            <summary>
+            Get the equivalent ModPlatform for this RuntimePlatform.
+            </summary>
+            <param name="self">A RuntimePlatform.</param>
+            <returns>The equivalent ModPlatform.</returns>
+        </member>
+        <member name="M:ModTool.Shared.ModPlatformExtensions.GetRuntimePlatforms(ModTool.Shared.ModPlatform)">
+            <summary>
+            Get a list of the equivalent RuntimePlatforms for this ModPlatform
+            </summary>
+            <param name="self">A ModPlatform instance.</param>
+            <returns>A List of equivalent RuntimePlatforms.</returns>
+        </member>
+        <member name="T:ModTool.Shared.ModToolSettings">
+            <summary>
+            Class for storing general ModTool settings.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModToolSettings.productName">
+            <summary>
+            The product name for the project.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModToolSettings.unityVersion">
+            <summary>
+            The unity version of the project.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModToolSettings.supportedPlatforms">
+            <summary>
+            The supported platforms for the project.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModToolSettings.supportedContent">
+            <summary>
+            The types of content that are supported for the project.
+            </summary>
+        </member>
+        <member name="P:ModTool.Shared.ModToolSettings.logLevel">
+            <summary>
+            Log filter level for the project.
+            </summary>        
+        </member>
+        <member name="T:ModTool.Shared.AssemblyFilter">
+            <summary>
+            Filter mode for finding Assemblies.
+            </summary>
+        </member>
+        <member name="T:ModTool.Shared.AssemblyUtility">
+            <summary>
+            Utility for finding Assemblies.
+            </summary>
+        </member>
+        <member name="M:ModTool.Shared.AssemblyUtility.GetAssemblies(System.String,ModTool.Shared.AssemblyFilter)">
+            <summary>
+            Find dll files in a directory and its sub directories.
+            </summary>
+            <param name="path">The directory to search in.</param>
+            <returns>A List of paths to found Assemblies.</returns>
+        </member>
+    </members>
+</doc>

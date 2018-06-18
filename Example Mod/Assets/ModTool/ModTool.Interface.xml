@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:ModTool.Interface.IModHandler">
+            <summary>
+            Provides methods for handling loading and unloading of mods.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.IModHandler.OnLoaded(ModTool.Interface.ContentHandler)">
+            <summary>
+            Called when the Mod is loaded.
+            </summary>
+            <param name="contentHandler">The Mod's ContentHandler.</param>
+        </member>
+        <member name="M:ModTool.Interface.IModHandler.OnUnloaded">
+            <summary>
+            Called when the Mod is unloaded.
+            </summary>
+        </member>
+        <member name="T:ModTool.Interface.IResource">
+            <summary>
+            A loadable resource
+            </summary>
+        </member>
+        <member name="P:ModTool.Interface.IResource.name">
+            <summary>
+            The resource's name.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.IResource.Load">
+            <summary>
+            Load the Resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.IResource.Unload">
+            <summary>
+            Unload the resource.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.IResource.LoadAsync">
+            <summary>
+            Load the resource asynchronously.
+            </summary>
+        </member>
+        <member name="T:ModTool.Interface.ModBehaviour">
+            <summary>
+            A MonoBehaviour class with some added functionality for Mods.
+            </summary>
+        </member>
+        <member name="P:ModTool.Interface.ModBehaviour.contentHandler">
+            <summary>
+            This Mod's ContentHandler, which provides the Mod's prefabs, scenes and Instantiate and AddComponent methods.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.OnLoaded(ModTool.Interface.ContentHandler)">
+            <summary>
+            Called when the Mod is loaded.
+            </summary>
+            <param name="contentHandler">The Mod's ContentHandler</param>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.OnUnloaded">
+            <summary>
+            Called when the mod is unloaded.
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.Instantiate(UnityEngine.Object,UnityEngine.Vector3,UnityEngine.Quaternion)">
+            <summary>
+            Use this instead of the static Instantiate methods in UnityEngine.Object. This ensures objects are spawned in the right scene.
+            </summary>
+            <param name="original">An existing object that you want to make a copy of.</param>
+            <param name="position">Position for the new object.</param>
+            <param name="rotation">Orientation of the new object.</param>
+            <returns>A clone of the original object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.Instantiate(UnityEngine.Object)">
+            <summary>
+            Use this instead of the static methods in UnityEngine.Object. This ensures objects are spawned in the right scene.
+            </summary>
+            <param name="original">An existing object that you want to make a copy of.</param>
+            <returns>A clone of the original object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.Instantiate``1(``0)">
+            <summary>
+            Use this instead of the static methods in UnityEngine.Object. This ensures objects are spawned in the right scene.
+            </summary>
+            <typeparam name="T">The type of the original.</typeparam>
+            <param name="original">An existing Object to copy.</param>
+            <returns>A clone of the original object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.AddComponent``1">
+            <summary>
+            Add a Component to this Component's GameObject.
+            </summary>
+            <typeparam name="T">The Component to add.</typeparam>
+            <returns>The Added Component.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.AddComponent``1(UnityEngine.GameObject)">
+            <summary>
+            Add a Component to a GameObject
+            </summary>
+            <typeparam name="T">The Type of the Component to add.</typeparam>
+            <param name="gameObject">The GameObject to add the Component to.</param>
+            <returns>The added Component</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.AddComponent(System.Type)">
+            <summary>
+            Add a Component this Component's GameObject
+            </summary>
+            <param name="componentType">The Type of the Component to add.</param>
+            <returns>The added Component</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.AddComponent(System.Type,UnityEngine.GameObject)">
+            <summary>
+            Add a Component to a GameObject
+            </summary>
+            <param name="componentType">The Type of the Component to add.</param>
+            <param name="gameObject">The GameObject to add the Component to.</param>
+            <returns>The added Component</returns>
+        </member>
+        <member name="M:ModTool.Interface.ModBehaviour.Destroy(UnityEngine.Object)">
+            <summary>
+            Remove an object.
+            </summary>
+            <param name="obj">The Object to destroy.</param>
+        </member>
+        <member name="T:ModTool.Interface.ContentHandler">
+            <summary>
+            Handles a Mod's content.
+            </summary>
+        </member>
+        <member name="P:ModTool.Interface.ContentHandler.mod">
+            <summary>
+            The Mod resource.
+            </summary>
+        </member>
+        <member name="P:ModTool.Interface.ContentHandler.modScenes">
+            <summary>
+            The Mod's ModScene resources.
+            </summary>
+        </member>
+        <member name="P:ModTool.Interface.ContentHandler.prefabs">
+            <summary>
+            The Mod's prefabs. 
+            </summary>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.#ctor(ModTool.Interface.IResource,System.Collections.ObjectModel.ReadOnlyCollection{ModTool.Interface.IResource},System.Collections.ObjectModel.ReadOnlyCollection{UnityEngine.GameObject})">
+            <summary>
+            Initialize a new ContentHandler with a Mod, ModScenes and prefabs.
+            </summary>
+            <param name="mod">A Mod resource</param>
+            <param name="modScenes">ModScene resources</param>
+            <param name="prefabs">prefab GameObjects</param>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.AddComponent``1(UnityEngine.GameObject)">
+            <summary>
+            Add a Component to a GameObject.
+            </summary>
+            <typeparam name="T">The Component Type.</typeparam>
+            <param name="gameObject">The GameObject to which to add the Component.</param>
+            <returns>The added Component.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.AddComponent(System.Type,UnityEngine.GameObject)">
+            <summary>
+            Add a Component to a GameObject.
+            </summary>
+            <param name="componentType">The Component Type.</param>
+            <param name="gameObject">The GameObject to which to add the Component.</param>
+            <returns>The added Component.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.Instantiate``1(``0)">
+            <summary>
+            Create a copy of the Object original.
+            </summary>
+            <typeparam name="T">The Object's Type.</typeparam>
+            <param name="original">An existing Object to copy.</param>
+            <returns>The new Object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.Instantiate(UnityEngine.Object,UnityEngine.Vector3,UnityEngine.Quaternion)">
+            <summary>
+            Create a copy of the Object original.
+            </summary>
+            <param name="original">An existing Object to copy.</param>
+            <param name="position">The position for the new Object.</param>
+            <param name="rotation">The roration for the new Object.</param>
+            <returns>The new Object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.Instantiate(UnityEngine.Object)">
+            <summary>
+            Create a copy of the Object original.
+            </summary>
+            <param name="original">An existing Object to copy.</param>
+            <returns>The new Object.</returns>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.Destroy(UnityEngine.Object)">
+            <summary>
+            Destroy an Object.
+            </summary>
+            <param name="obj">The Object to destroy.</param>
+        </member>
+        <member name="M:ModTool.Interface.ContentHandler.Clear">
+            <summary>
+            Destroy all instantiated GameObjects.
+            </summary>
+        </member>
+    </members>
+</doc>

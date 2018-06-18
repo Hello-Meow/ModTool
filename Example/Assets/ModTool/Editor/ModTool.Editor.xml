@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ModTool.Editor</name>
+    </assembly>
+    <members>
+        <member name="M:ModTool.Editor.ExporterCreator.CreateExporter">
+            <summary>
+            Create a mod exporter package for this game.
+            </summary>
+        </member>
+        <member name="M:ModTool.Editor.ExporterCreator.CreateExporterPostBuild(UnityEditor.BuildTarget,System.String)">
+            <summary>
+            Create a mod exporter package after building the game.
+            </summary>
+        </member>
+        <member name="M:ModTool.Editor.ExporterCreator.DisableExporter">
+            <summary>
+            Disables the exporter Assembly after creating the package.
+            </summary>
+        </member>
+    </members>
+</doc>
