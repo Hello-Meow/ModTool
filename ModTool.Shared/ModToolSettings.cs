@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using ModTool.Shared;
 
 namespace ModTool.Shared
 {
@@ -85,11 +84,11 @@ namespace ModTool.Shared
         
         void OnEnable()
         {
-            if (string.IsNullOrEmpty(_productName))            
-                _productName = Application.productName;            
+            if (string.IsNullOrEmpty(_productName))
+                _productName = Application.productName;
 
-            if (string.IsNullOrEmpty(_unityVersion))            
-                _unityVersion = Application.unityVersion;            
+            if (string.IsNullOrEmpty(_unityVersion))
+                _unityVersion = Application.unityVersion;
         }
 
         [RuntimeInitializeOnLoadMethod]

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -46,6 +47,8 @@ namespace ModTool.Editor
         private static void CreateExporter(ExportPackageOptions exportPackageOptions, string path)
         {
             LogUtility.LogInfo("Creating Exporter");
+
+            UpdateSettings();
 
             ModToolSettings modToolSettings = ModToolSettings.instance;
             CodeSettings codeSettings = CodeSettings.instance;
@@ -96,6 +99,17 @@ namespace ModTool.Editor
                 assemblyPaths[i] = AssetUtility.GetRelativePath(assemblyPaths[i]);
             
             return assemblyPaths;
-        }            
+        }   
+        
+        private static void UpdateSettings()
+        {
+            if (string.IsNullOrEmpty(ModToolSettings.productName) || ModToolSettings.productName != Application.productName)
+                typeof(ModToolSettings).GetField("_productName", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.productName);
+
+            if (string.IsNullOrEmpty(ModToolSettings.unityVersion) || ModToolSettings.unityVersion != Application.unityVersion)            
+                typeof(ModToolSettings).GetField("_unityVersion", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.unityVersion);
+
+            EditorUtility.SetDirty(ModToolSettings.instance);
+        }
     }
 }
