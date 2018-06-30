@@ -1,3 +1,6 @@
+Version 1.3.1:
+-Fix for ModToolSettings not being updated with correct unityVersion and productName
+
 Version 1.3.0:
 -Use ModToolSettings and CodeSettings directly instead of modifying ProductSettings for exporter
 -Use Unity's builtin serialization instead of xml for ModInfo

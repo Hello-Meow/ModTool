@@ -77,6 +77,7 @@ namespace ModTool.Editor
             
             SetPluginEnabled(exporterPath, true);
 
+            //TODO: ExportPackageOptions.IncludeLibraryAssets makes the package huge in Unity 2017.2
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, exportPackageOptions | ExportPackageOptions.IncludeLibraryAssets);
         }
 
