@@ -67,6 +67,9 @@ namespace ModTool.Shared.Editor
                 if (assetPath.Contains("ModTool"))
                     continue;
 
+                if (assetPath.StartsWith("Packages"))
+                    continue;
+
                 //NOTE: AssetDatabase.FindAssets() can contain duplicates for some reason
                 if (assetPaths.Contains(assetPath))
                     continue;
