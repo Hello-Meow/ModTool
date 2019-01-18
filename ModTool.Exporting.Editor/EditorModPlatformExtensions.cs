@@ -28,7 +28,7 @@ namespace ModTool.Exporting.Editor
                     if ((self & ModPlatform.Linux) == ModPlatform.Linux)
                         return true;
                     break;
-                case BuildTarget.StandaloneOSXUniversal:
+                case BuildTarget.StandaloneOSX:
                     if ((self & ModPlatform.OSX) == ModPlatform.OSX)
                         return true;
                     break;
@@ -54,7 +54,7 @@ namespace ModTool.Exporting.Editor
                     return ModPlatform.Windows;
                 case BuildTarget.StandaloneLinuxUniversal:
                     return ModPlatform.Linux;
-                case BuildTarget.StandaloneOSXUniversal:
+                case BuildTarget.StandaloneOSX:
                     return ModPlatform.OSX;
                 case BuildTarget.Android:
                     return ModPlatform.Android;
