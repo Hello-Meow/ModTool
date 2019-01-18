@@ -42,6 +42,10 @@ namespace ModTool
         /// </summary>
         public event Action<Mod> ModLoadCancelled;
         /// <summary>
+        /// Occurs when a directory has been successfully searched for mods.
+        /// </summary>
+        public event Action<ModSearchDirectory> ModSearchComplete;
+        /// <summary>
         /// Occurs when a ModScene has been loaded
         /// </summary>
         public event Action<ModScene> SceneLoaded;
@@ -154,6 +158,12 @@ namespace ModTool
                 ModLoadCancelled.Invoke((Mod)mod);
         }
 
+        private void OnModsChanged(ModSearchDirectory directory)
+        {
+            if (ModSearchComplete != null)
+                ModSearchComplete.Invoke(directory);
+        }
+
         private void OnSceneLoaded(ModScene scene)
         {
             if (SceneLoaded != null)
@@ -188,6 +198,7 @@ namespace ModTool
             directory.ModFound += OnModFound;
             directory.ModRemoved += OnModRemoved;
             directory.ModChanged += OnModChanged;
+            directory.ModsChanged += () => OnModsChanged(directory);
 
             searchDirectories.Add(directory);
 
