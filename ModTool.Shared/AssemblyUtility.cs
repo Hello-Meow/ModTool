@@ -48,8 +48,9 @@ namespace ModTool.Shared
                     continue;
                 }
 
+                string name = assemblyDefinition.Name.Name;
 
-                if (assemblyDefinition.Name.FullName.Contains("ModTool"))
+                if (name == "ModTool" || name.StartsWith("ModTool."))
                 {
                     if ((assemblyFilter & AssemblyFilter.ModToolAssemblies) != 0)
                         assemblies.Add(assembly);
@@ -57,7 +58,7 @@ namespace ModTool.Shared
                     continue;
                 }
                 
-                if(assemblyDefinition.Name.FullName.Contains("Mono.Cecil"))
+                if(name.Contains("Mono.Cecil"))
                 {
                     if((assemblyFilter & AssemblyFilter.ModToolAssemblies) != 0)
                         assemblies.Add(assembly);
@@ -65,7 +66,7 @@ namespace ModTool.Shared
                     continue;
                 }
 
-                if(CodeSettings.apiAssemblies.Contains(assemblyDefinition.Name.Name))
+                if(CodeSettings.apiAssemblies.Contains(name))
                 {
                     if((assemblyFilter & AssemblyFilter.ApiAssemblies) != 0)
                         assemblies.Add(assembly);
