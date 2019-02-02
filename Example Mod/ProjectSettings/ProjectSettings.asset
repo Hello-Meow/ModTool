@@ -89,7 +89,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleIdentifier: com.HelloMeow.ModToolRelease
+  bundleIdentifier: com.HelloMeow.Example
   bundleVersion: 1.0
   preloadedAssets: []
   metroEnableIndependentInputSource: 0

@@ -247,7 +247,7 @@ namespace ModTool
                 if (resource.canLoad)
                 {
                     resource._loadState = new LoadingState(resource);
-                    yield return resource.LoadResources();
+                    yield return resource.LoadResources(); //TODO: this skips a frame
                     resource.End();                    
                 }
             }

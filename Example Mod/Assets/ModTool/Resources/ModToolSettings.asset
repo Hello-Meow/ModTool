@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 1009295391, guid: b981ac5fea65cbf46ab728daad9c9206, type: 3}
   m_Name: ModToolSettings
   m_EditorClassIdentifier: 
-  _productName: ModTool Release
+  _productName: Example
   _unityVersion: 5.3.1p1
   _supportedPlatforms: 15
   _supportedContent: 7

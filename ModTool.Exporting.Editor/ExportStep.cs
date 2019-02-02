@@ -234,6 +234,8 @@ namespace ModTool.Exporting.Editor
             if (!string.IsNullOrEmpty(settings.version))
                 prefix += settings.version.Replace(" ", "") + "-";
 
+            List<string> searchDirectories = GetSearchDirectories();
+
             foreach (string scriptAssembly in scriptAssemblies)
             {
                 string scriptAssemblyPath = Path.Combine(tempAssemblyDirectory, scriptAssembly);
@@ -245,8 +247,9 @@ namespace ModTool.Exporting.Editor
                 AssemblyNameDefinition assemblyName = assembly.Name;
 
                 DefaultAssemblyResolver resolver = (DefaultAssemblyResolver)assembly.MainModule.AssemblyResolver;
-                resolver.AddSearchDirectory(Path.GetDirectoryName(typeof(UnityEngine.Object).Assembly.Location));
-                resolver.AddSearchDirectory(assetsDirectory);
+
+                foreach (string searchDirectory in searchDirectories)
+                    resolver.AddSearchDirectory(searchDirectory);
 
                 assemblyName.Name = prefix + assemblyName.Name;
 
@@ -268,6 +271,23 @@ namespace ModTool.Exporting.Editor
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate | ImportAssetOptions.DontDownloadFromCacheServer);
                 ForceAssemblyReload();
             }            
+        }
+
+        private static List<string> GetSearchDirectories()
+        {
+            List<string> searchDirectories = new List<string>()
+            {
+                Path.GetDirectoryName(typeof(UnityEngine.Object).Assembly.Location),
+                assetsDirectory
+            };
+
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (a.GetName().Name == "netstandard")
+                    searchDirectories.Add(Path.GetDirectoryName(a.Location));
+            }
+
+            return searchDirectories;
         }
     }
 
