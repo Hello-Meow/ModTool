@@ -43,8 +43,9 @@ namespace ModTool.Shared
                 {
                     assemblyDefinition = Mono.Cecil.AssemblyDefinition.ReadAssembly(assembly);
                 }
-                catch
+                catch(Exception e)
                 {
+                    LogUtility.LogDebug(e.Message);
                     continue;
                 }
 
