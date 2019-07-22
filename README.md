@@ -23,6 +23,6 @@ See the included examples, the [Wiki](https://github.com/Hello-Meow/ModTool/wiki
 - Mods have to rely on the game's project settings. This means mods can not define their own new tags, layers and input axes. The created Mod exporter includes the game's project settings
 - Supports Unity 5.3.1 and up
 
-## Acknowledgements
+## Acknowledgments
 
 - [Mono.Cecil](https://github.com/jbevain/cecil) by Jb Evain

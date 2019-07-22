@@ -67,6 +67,9 @@ namespace ModTool.Shared.Editor
                 if (assetPath.Contains("ModTool"))
                     continue;
 
+                if (assetPath.Contains("/Editor/"))
+                    continue;
+
                 if (assetPath.StartsWith("Packages"))
                     continue;
 
