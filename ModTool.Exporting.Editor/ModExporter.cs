@@ -18,6 +18,11 @@ namespace ModTool.Exporting.Editor
         public static event Action ExportStarting;
 
         /// <summary>
+        /// Occurs after the export process is completed.
+        /// </summary>
+        public static event Action ExportComplete;
+
+        /// <summary>
         /// Is this ModExporter currently exporting a Mod?
         /// </summary>
         public bool isExporting { get { return currentStep >= 0; } }
@@ -109,6 +114,9 @@ namespace ModTool.Exporting.Editor
                     break;
 
                 currentStep++;
+
+                if (currentStep == exportSteps.Length)
+                    ExportComplete?.Invoke();
 
                 if (step.waitForAssemblyReload)
                     return;
