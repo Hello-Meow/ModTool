@@ -86,16 +86,20 @@
             Occurs when the export process is starting.
             </summary>
         </member>
+        <member name="E:ModTool.Exporting.Editor.ModExporter.ExportComplete">
+            <summary>
+            Occurs after the export process is completed.
+            </summary>
+        </member>
         <member name="P:ModTool.Exporting.Editor.ModExporter.isExporting">
             <summary>
             Is this ModExporter currently exporting a Mod?
             </summary>
         </member>
-        <member name="M:ModTool.Exporting.Editor.ModExporter.ExportMod(ModTool.Exporting.Editor.ExportSettings)">
+        <member name="M:ModTool.Exporting.Editor.ModExporter.ExportMod">
             <summary>
             Start exporting a Mod.
             </summary>
-            <param name="settings">The settings to use for exporting the Mod.</param>
         </member>
         <member name="T:ModTool.Exporting.Editor.ModSurrogate">
             <summary>

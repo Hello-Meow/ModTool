@@ -14,10 +14,5 @@
             Create a mod exporter package after building the game.
             </summary>
         </member>
-        <member name="M:ModTool.Editor.ExporterCreator.DisableExporter">
-            <summary>
-            Disables the exporter Assembly after creating the package.
-            </summary>
-        </member>
     </members>
 </doc>

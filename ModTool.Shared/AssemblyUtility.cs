@@ -10,8 +10,7 @@ namespace ModTool.Shared
     /// </summary>
     [Flags]
     public enum AssemblyFilter { ApiAssemblies = 1, ModToolAssemblies = 2, ModAssemblies = 4 }
-
-
+    
     /// <summary>
     /// Utility for finding Assemblies.
     /// </summary>

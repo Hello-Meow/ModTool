@@ -29,13 +29,6 @@
             <param name="filter">The filter string can contain search data for: names, asset labels and types (class names).</param>
             <returns>A list of asset paths</returns>
         </member>
-        <member name="M:ModTool.Shared.Editor.AssetUtility.MoveAssets(System.Collections.Generic.List{System.String},System.String)">
-            <summary>
-            Move assets to a directory.
-            </summary>
-            <param name="assetPaths">A list of asset paths</param>
-            <param name="targetDirectory">The directory to move all assets to.</param>
-        </member>
         <member name="M:ModTool.Shared.Editor.AssetUtility.CreateAsset(UnityEngine.ScriptableObject)">
             <summary>
             Create an asset for a ScriptableObject in a ModTool Resources directory.

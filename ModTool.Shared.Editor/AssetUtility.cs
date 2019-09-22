@@ -84,28 +84,6 @@ namespace ModTool.Shared.Editor
         }
 
         /// <summary>
-        /// Move assets to a directory.
-        /// </summary>
-        /// <param name="assetPaths">A list of asset paths</param>
-        /// <param name="targetDirectory">The directory to move all assets to.</param>
-        public static void MoveAssets(List<string> assetPaths, string targetDirectory)
-        {
-            for (int i = 0; i < assetPaths.Count; i++)
-            {
-                string assetPath = assetPaths[i];
-
-                if (Path.GetDirectoryName(assetPath) != targetDirectory)
-                {
-                    string assetName = Path.GetFileName(assetPath);
-                    string newAssetPath = Path.Combine(targetDirectory, assetName);
-
-                    AssetDatabase.MoveAsset(assetPath, newAssetPath);
-                    assetPaths[i] = newAssetPath;
-                }
-            }
-        }
-
-        /// <summary>
         /// Create an asset for a ScriptableObject in a ModTool Resources directory.
         /// </summary>
         /// <param name="scriptableObject">A ScriptableObject instance.</param>

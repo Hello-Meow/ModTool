@@ -19,7 +19,7 @@ namespace ModTool.Editor
         [MenuItem("Tools/ModTool/Create Exporter")]
         public static void CreateExporter()
         {
-            CreateExporter(ExportPackageOptions.Interactive, Directory.GetCurrentDirectory());
+            CreateExporter(Directory.GetCurrentDirectory(), true);
         }
 
         /// <summary>
@@ -30,21 +30,10 @@ namespace ModTool.Editor
         {
             pathToBuiltProject = Path.GetDirectoryName(pathToBuiltProject);
 
-            CreateExporter(ExportPackageOptions.Default, pathToBuiltProject);
+            CreateExporter(pathToBuiltProject);
         }
-
-        /// <summary>
-        /// Disables the exporter Assembly after creating the package.
-        /// </summary>
-        [UnityEditor.Callbacks.DidReloadScripts]
-        public static void DisableExporter()
-        {
-            string modToolDirectory = AssetUtility.GetModToolDirectory();
-            string exporterPath = Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Exporting.Editor.dll"));
-            SetPluginEnabled(exporterPath, false);
-        }
-
-        private static void CreateExporter(ExportPackageOptions exportPackageOptions, string path)
+        
+        private static void CreateExporter(string path, bool revealPackage = false)
         {
             LogUtility.LogInfo("Creating Exporter");
 
@@ -71,14 +60,21 @@ namespace ModTool.Editor
                 Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "LICENSE.txt"))
             };
 
-            List<string> assemblyPaths = GetApiAssemblyPaths(CodeSettings.apiAssemblies);
-            AssetUtility.MoveAssets(assemblyPaths, modToolDirectory);
-            assetPaths.AddRange(assemblyPaths);
-            
             SetPluginEnabled(exporterPath, true);
 
-            //TODO: ExportPackageOptions.IncludeLibraryAssets makes the package huge in Unity 2017.2
-            AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, exportPackageOptions | ExportPackageOptions.IncludeLibraryAssets);
+            List<string> assemblyPaths = GetApiAssemblies(CodeSettings.apiAssemblies);
+            
+            assetPaths.AddRange(assemblyPaths);
+
+            AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, ExportPackageOptions.IncludeLibraryAssets);
+
+            foreach (string assemblyPath in assemblyPaths)
+                AssetDatabase.DeleteAsset(assemblyPath);
+
+            SetPluginEnabled(exporterPath, false);
+
+            if(revealPackage)
+                EditorUtility.RevealInFinder(fileName);
         }
 
         private static void SetPluginEnabled(string pluginPath, bool enabled)
@@ -92,13 +88,24 @@ namespace ModTool.Editor
             pluginImporter.SaveAndReimport();
         }
 
-        private static List<string> GetApiAssemblyPaths(List<string> apiAssemblies)
+        private static List<string> GetApiAssemblies(List<string> apiAssemblies)
         {
-            List<string> assemblyPaths = AssemblyUtility.GetAssemblies(Application.dataPath, AssemblyFilter.ApiAssemblies);
-
-            for(int i = 0; i < assemblyPaths.Count; i++)            
-                assemblyPaths[i] = AssetUtility.GetRelativePath(assemblyPaths[i]);
+            List<string> assemblyPaths = AssemblyUtility.GetAssemblies(Directory.GetCurrentDirectory(), AssemblyFilter.ApiAssemblies);
             
+            string modToolDirectory = AssetUtility.GetModToolDirectory();
+
+            for (int i = 0; i < assemblyPaths.Count; i++)
+            {
+                string path = assemblyPaths[i];
+                string fileName = Path.GetFileName(path);
+                string newPath = Path.Combine(modToolDirectory, fileName);
+
+                File.Copy(path, newPath);
+                AssetDatabase.ImportAsset(newPath);
+
+                assemblyPaths[i] = newPath;
+            }
+
             return assemblyPaths;
         }   
         
@@ -111,6 +118,12 @@ namespace ModTool.Editor
                 typeof(ModToolSettings).GetField("_unityVersion", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.unityVersion);
 
             EditorUtility.SetDirty(ModToolSettings.instance);
+        }
+
+        private static void ShowExplorer(string path)
+        {
+            path = path.Replace(@"/", @"\");   // explorer doesn't like front slashes
+            System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
         }
     }
 }
