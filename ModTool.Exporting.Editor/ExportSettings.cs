@@ -12,77 +12,105 @@ namespace ModTool.Exporting.Editor
         /// <summary>
         /// The Mod's name.
         /// </summary>
-        public new string name
+        public static new string name
         {
             get
             {
-                return _name;
+                return instance._name;
+            }
+            set
+            {
+                instance._name = value;
             }
         }
 
         /// <summary>
         /// The Mod's author.
         /// </summary>
-        public string author
+        public static string author
         {
             get
             {
-                return _author;
+                return instance._author;
+            }
+            set
+            {
+                instance._author = value;
             }
         }
 
         /// <summary>
         /// The Mod's description.
         /// </summary>
-        public string description
+        public static string description
         {
             get
             {
-                return _description;
+                return instance._description;
+            }
+            set
+            {
+                instance._description = value;
             }
         }
                 
         /// <summary>
         /// The Mod's version.
         /// </summary>
-        public string version
+        public static string version
         {
             get
             {
-                return _version;
+                return instance._version;
+            }
+            set
+            {
+                instance._version = value;
             }
         }
 
         /// <summary>
         /// The selected platforms for which this mod will be exported.
         /// </summary>
-        public ModPlatform platforms
+        public static ModPlatform platforms
         {
             get
             {
-                return _platforms;
+                return instance._platforms;
+            }
+            set
+            {
+                instance._platforms = value;
             }
         }
 
         /// <summary>
         /// The selected content types that will be exported.
         /// </summary>
-        public ModContent content
+        public static ModContent content
         {
             get
             {
-                return _content;
+                return instance._content;
+            }
+            set
+            {
+                instance._content = value;
             }
         }
         
         /// <summary>
         /// The directory to which the Mod will be exported.
         /// </summary>
-        public string outputDirectory
+        public static string outputDirectory
         {
             get
             {
-                return _outputDirectory;
+                return instance._outputDirectory;
+            }
+            set
+            {
+                instance._outputDirectory = value;
             }
         }
 

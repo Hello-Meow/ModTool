@@ -25,7 +25,13 @@ namespace ModTool.Exporting.Editor
         /// <summary>
         /// Is this ModExporter currently exporting a Mod?
         /// </summary>
-        public bool isExporting { get { return currentStep >= 0; } }
+        public static bool isExporting
+        {
+            get
+            {
+                return instance.currentStep >= 0;
+            }
+        }
 
         private ExportStep[] exportSteps = new ExportStep[]
         {
@@ -41,9 +47,7 @@ namespace ModTool.Exporting.Editor
 
         [SerializeField]
         private int currentStep = -1;        
-        
-        private ExportSettings settings;     
-        
+                
         private ExportData data;
 
         private static bool didReloadScripts;
@@ -56,6 +60,7 @@ namespace ModTool.Exporting.Editor
         void OnDisable()
         {
             ExportStarting = null;
+            ExportComplete = null;
             EditorApplication.update -= Update;
         }
 
@@ -80,8 +85,7 @@ namespace ModTool.Exporting.Editor
         /// <summary>
         /// Start exporting a Mod.
         /// </summary>
-        /// <param name="settings">The settings to use for exporting the Mod.</param>
-        public void ExportMod(ExportSettings settings)
+        public static void ExportMod()
         {
             if(isExporting)
             {
@@ -89,10 +93,14 @@ namespace ModTool.Exporting.Editor
                 return;
             }
 
-            this.settings = settings;
+            instance.StartExport();
+        }
+
+        private void StartExport()
+        {
             data = new ExportData();
 
-            LogUtility.LogInfo("Exporting Mod: " + settings.name);
+            LogUtility.LogInfo("Exporting Mod: " + ExportSettings.name);
 
             ExportStarting?.Invoke();
 
@@ -131,7 +139,7 @@ namespace ModTool.Exporting.Editor
 
             try
             {
-                step.Execute(settings, data);
+                step.Execute(data);
             }
             catch (Exception e)
             {

@@ -5,10 +5,6 @@ namespace ModTool.Exporting.Editor
 {
     internal class ExporterEditorWindow : EditorWindow
     {
-        public ModExporter exporter;
-
-        private ExportSettings exportSettings;
-
         private UnityEditor.Editor exportSettingsEditor;
 
         [MenuItem("Tools/ModTool/Export Mod")]
@@ -22,9 +18,7 @@ namespace ModTool.Exporting.Editor
 
         void OnEnable()
         {
-            exporter = ModExporter.instance;
-
-            exportSettings = ExportSettings.instance;
+            ExportSettings exportSettings = ExportSettings.instance;
 
             exportSettingsEditor = UnityEditor.Editor.CreateEditor(exportSettings);
         }
@@ -36,7 +30,7 @@ namespace ModTool.Exporting.Editor
 
         void OnGUI()
         {
-            GUI.enabled = !EditorApplication.isCompiling && !exporter.isExporting && !Application.isPlaying;
+            GUI.enabled = !EditorApplication.isCompiling && !ModExporter.isExporting && !Application.isPlaying;
 
             exportSettingsEditor.OnInspectorGUI();
 
@@ -45,7 +39,7 @@ namespace ModTool.Exporting.Editor
             bool buttonPressed = GUILayout.Button("Export Mod", GUILayout.Height(30));
 
             if (buttonPressed)
-                exporter.ExportMod(exportSettings);
+                ModExporter.ExportMod();
         }
     }
 }

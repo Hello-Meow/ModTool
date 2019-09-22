@@ -36,7 +36,7 @@ namespace ModTool.Exporting.Editor
 
         public abstract string message { get; }
 
-        internal abstract void Execute(ExportSettings settings, ExportData data);
+        internal abstract void Execute(ExportData data);
 
         protected void ForceAssemblyReload()
         {
@@ -49,14 +49,14 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Starting Export"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             data.loadedScene = SceneManager.GetActiveScene().path;
 
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())            
                 throw new Exception("Cancelled by user");
 
-            data.prefix = settings.name + "-";
+            data.prefix = ExportSettings.name + "-";
                         
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
@@ -66,11 +66,11 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Verifying Project"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             CheckSerializationMode();
             VerifyProject();
-            VerifySettings(settings);
+            VerifySettings();
         }
 
         private void CheckSerializationMode()
@@ -94,21 +94,21 @@ namespace ModTool.Exporting.Editor
                 throw new Exception("Incompatible scripts or assemblies found");           
         }
 
-        private void VerifySettings(ExportSettings settings)
+        private void VerifySettings()
         {
-            if (string.IsNullOrEmpty(settings.name))
+            if (string.IsNullOrEmpty(ExportSettings.name))
                 throw new Exception("Mod has no name");            
 
-            if (string.IsNullOrEmpty(settings.outputDirectory))            
+            if (string.IsNullOrEmpty(ExportSettings.outputDirectory))            
                 throw new Exception("No output directory set");             
 
-            if (!Directory.Exists(settings.outputDirectory))            
-                throw new Exception("Output directory " + settings.outputDirectory + " does not exist");
+            if (!Directory.Exists(ExportSettings.outputDirectory))            
+                throw new Exception("Output directory " + ExportSettings.outputDirectory + " does not exist");
             
-            if (settings.platforms == 0)            
+            if (ExportSettings.platforms == 0)            
                 throw new Exception("No platforms selected");            
 
-            if (settings.content == 0)            
+            if (ExportSettings.content == 0)            
                 throw new Exception("No content selected");
         }
 
@@ -141,14 +141,14 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Finding Content"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {            
             data.assemblies = GetAssemblies();
             data.assets = GetAssets("t:prefab t:scriptableobject");
             data.scenes = GetAssets("t:scene");
             data.scripts = GetAssets("t:monoscript");
             
-            ModContent content = settings.content;
+            ModContent content = ExportSettings.content;
 
             if (data.assets.Count == 0)
                 content &= ~ModContent.Assets;
@@ -189,7 +189,7 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Creating Backup"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             AssetDatabase.SaveAssets();
 
@@ -221,7 +221,7 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Importing Script Assemblies"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             if((data.content & ModContent.Code) != ModContent.Code)
                 return;
@@ -231,8 +231,8 @@ namespace ModTool.Exporting.Editor
 
             string prefix = data.prefix.Replace(" ", "");
 
-            if (!string.IsNullOrEmpty(settings.version))
-                prefix += settings.version.Replace(" ", "") + "-";
+            if (!string.IsNullOrEmpty(ExportSettings.version))
+                prefix += ExportSettings.version.Replace(" ", "") + "-";
 
             List<string> searchDirectories = GetSearchDirectories();
 
@@ -295,7 +295,7 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Updating Assets"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             var allAssets = data.assets.Concat(data.scenes);
             UpdateReferences(allAssets, data.scriptAssemblies);
@@ -305,7 +305,7 @@ namespace ModTool.Exporting.Editor
             if ((data.content & ModContent.Assets) == ModContent.Assets)
             {
                 foreach (Asset asset in data.assets)
-                    asset.SetAssetBundle(settings.name, "assets");
+                    asset.SetAssetBundle(ExportSettings.name, "assets");
             }
 
             if ((data.content & ModContent.Scenes) == ModContent.Scenes)
@@ -313,7 +313,7 @@ namespace ModTool.Exporting.Editor
                 foreach (Asset scene in data.scenes)
                 {
                     scene.name = data.prefix + scene.name;
-                    scene.SetAssetBundle(settings.name, "scenes");
+                    scene.SetAssetBundle(ExportSettings.name, "scenes");
                 }
             }
         }
@@ -413,10 +413,10 @@ namespace ModTool.Exporting.Editor
         private string tempModDirectory;
         private string modDirectory;
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
-            tempModDirectory = Path.Combine("Temp", settings.name);
-            modDirectory = Path.Combine(settings.outputDirectory, settings.name);
+            tempModDirectory = Path.Combine("Temp", ExportSettings.name);
+            modDirectory = Path.Combine(ExportSettings.outputDirectory, ExportSettings.name);
 
             if (Directory.Exists(tempModDirectory))
                 Directory.Delete(tempModDirectory, true);
@@ -429,20 +429,20 @@ namespace ModTool.Exporting.Editor
             foreach (Asset assembly in data.scriptAssemblies)
                 assembly.Copy(tempModDirectory);
 
-            ModPlatform platforms = settings.platforms;
+            ModPlatform platforms = ExportSettings.platforms;
 
             BuildAssetBundles(platforms);
 
             ModInfo modInfo = new ModInfo(
-                settings.name,
-                settings.author,
-                settings.description,
-                settings.version,
+                ExportSettings.name,
+                ExportSettings.author,
+                ExportSettings.description,
+                ExportSettings.version,
                 Application.unityVersion,
                 platforms,
                 data.content);
 
-            ModInfo.Save(Path.Combine(tempModDirectory, settings.name + ".info"), modInfo);
+            ModInfo.Save(Path.Combine(tempModDirectory, ExportSettings.name + ".info"), modInfo);
 
             CopyToOutput();
 
@@ -501,7 +501,7 @@ namespace ModTool.Exporting.Editor
     {
         public override string message { get { return "Restoring Project"; } }
 
-        internal override void Execute(ExportSettings settings, ExportData data)
+        internal override void Execute(ExportData data)
         {
             foreach (Asset scriptAssembly in data.scriptAssemblies)
                 scriptAssembly.Delete();

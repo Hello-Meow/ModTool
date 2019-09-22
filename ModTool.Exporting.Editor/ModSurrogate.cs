@@ -15,7 +15,6 @@ namespace ModTool.Exporting.Editor
         [RuntimeInitializeOnLoadMethod]
         private static void InitializeModSurrogate()
         {
-            ExportSettings settings = ExportSettings.instance;
             List<GameObject> prefabs = new List<GameObject>();
             List<IResource> scenes = new List<IResource>();
 
@@ -32,7 +31,7 @@ namespace ModTool.Exporting.Editor
                 scenes.Add(new ModSceneSurrogate(sceneName));
             }
 
-            ModSurrogate mod = new ModSurrogate(settings.name);
+            ModSurrogate mod = new ModSurrogate(ExportSettings.name);
 
             ContentHandler contentHandler = new ContentHandler(mod, scenes.AsReadOnly(), prefabs.AsReadOnly());
 
