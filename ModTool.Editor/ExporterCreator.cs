@@ -45,6 +45,7 @@ namespace ModTool.Editor
             string modToolDirectory = AssetUtility.GetModToolDirectory();
             string exporterPath = Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Exporting.Editor.dll"));
             string fileName = Path.Combine(path, Application.productName + " Mod Tools.unitypackage");
+            string projectSettingsDirectory = "ProjectSettings";
 
             List<string> assetPaths = new List<string>
             {
@@ -57,7 +58,11 @@ namespace ModTool.Editor
                 Path.Combine(modToolDirectory, "ModTool.Interface.dll"),
                 Path.Combine(modToolDirectory, "ModTool.Interface.xml"),
                 Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "Mono.Cecil.dll")),
-                Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "LICENSE.txt"))
+                Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "LICENSE.txt")),
+                Path.Combine(projectSettingsDirectory, "InputManager.asset"),
+                Path.Combine(projectSettingsDirectory, "TagManager.asset"),
+                Path.Combine(projectSettingsDirectory, "Physics2DSettings.asset"),
+                Path.Combine(projectSettingsDirectory, "DynamicsManager.asset")
             };
 
             SetPluginEnabled(exporterPath, true);
@@ -66,7 +71,7 @@ namespace ModTool.Editor
             
             assetPaths.AddRange(assemblyPaths);
 
-            AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName, ExportPackageOptions.IncludeLibraryAssets);
+            AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName);
 
             foreach (string assemblyPath in assemblyPaths)
                 AssetDatabase.DeleteAsset(assemblyPath);
@@ -118,12 +123,6 @@ namespace ModTool.Editor
                 typeof(ModToolSettings).GetField("_unityVersion", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.unityVersion);
 
             EditorUtility.SetDirty(ModToolSettings.instance);
-        }
-
-        private static void ShowExplorer(string path)
-        {
-            path = path.Replace(@"/", @"\");   // explorer doesn't like front slashes
-            System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
         }
     }
 }
