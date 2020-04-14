@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: ModToolSettings
   m_EditorClassIdentifier: 
   _productName: Example
-  _unityVersion: 5.3.1p1
+  _unityVersion: 5.6.0f3
   _supportedPlatforms: 15
   _supportedContent: 7
   _logLevel: 3
