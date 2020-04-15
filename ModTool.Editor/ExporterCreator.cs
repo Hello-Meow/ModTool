@@ -67,8 +67,11 @@ namespace ModTool.Editor
 
             SetPluginEnabled(exporterPath, true);
 
-            List<string> assemblyPaths = GetApiAssemblies(CodeSettings.apiAssemblies);
-            
+            List<string> assemblyPaths = new List<string>();
+
+            GetApiAssemblies("Assets", assemblyPaths);
+            GetApiAssemblies("Library", assemblyPaths);
+
             assetPaths.AddRange(assemblyPaths);
 
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName);
@@ -93,25 +96,22 @@ namespace ModTool.Editor
             pluginImporter.SaveAndReimport();
         }
 
-        private static List<string> GetApiAssemblies(List<string> apiAssemblies)
+        private static void GetApiAssemblies(string path, List<string> assemblies)
         {
-            List<string> assemblyPaths = AssemblyUtility.GetAssemblies(Directory.GetCurrentDirectory(), AssemblyFilter.ApiAssemblies);
+            List<string> assemblyPaths = AssemblyUtility.GetAssemblies(path, AssemblyFilter.ApiAssemblies);
             
             string modToolDirectory = AssetUtility.GetModToolDirectory();
-
-            for (int i = 0; i < assemblyPaths.Count; i++)
+            
+            foreach(string assemblyPath in assemblyPaths)
             {
-                string path = assemblyPaths[i];
-                string fileName = Path.GetFileName(path);
+                string fileName = Path.GetFileName(assemblyPath);
                 string newPath = Path.Combine(modToolDirectory, fileName);
 
-                File.Copy(path, newPath);
+                File.Copy(assemblyPath, newPath, true);
                 AssetDatabase.ImportAsset(newPath);
 
-                assemblyPaths[i] = newPath;
-            }
-
-            return assemblyPaths;
+                assemblies.Add(newPath);
+            }            
         }   
         
         private static void UpdateSettings()
