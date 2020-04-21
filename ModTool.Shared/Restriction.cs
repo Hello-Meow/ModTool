@@ -43,37 +43,26 @@ namespace ModTool.Shared.Verification
         /// Verify a member with this Restriction.
         /// </summary>
         /// <param name="member">A member.</param>
-        /// <param name="excludedAssemblies">A List of Assembly names that should be ignored.</param>
-        /// <returns>False if the Member fails the verification.</returns>
-        public bool Verify(MemberReference member, List<string> excludedAssemblies)
+        /// <param name="messages">A list of messages of failed Restrictions.</param>
+        public void Verify(MemberReference member, List<string> messages)
         {
-            if (Applicable(member))
-            {
-                bool present;
+            if (!Applicable(member))
+                return;
 
-                if (member is MethodReference)
-                    present = PresentInMethodRecursive(member as MethodReference, excludedAssemblies);
-                else
-                    present = Present(member);
+            bool present;
 
-                if (present)
-                {
-                    if (restrictionMode == RestrictionMode.Prohibited)
-                    {
-                        LogMessage(member);
-                        return false;
-                    }
-                }
-                else if (restrictionMode == RestrictionMode.Required)
-                {
-                    LogMessage(member);
-                    return false;
-                }
-            }
+            if (member is MethodReference)
+                present = PresentInMethodRecursive(member as MethodReference);
+            else
+                present = Present(member);
 
-            return true;
+            if (present && restrictionMode == RestrictionMode.Prohibited)
+                messages.Add(GetMessage(member));
+
+            if (!present &&restrictionMode == RestrictionMode.Required)
+                messages.Add(GetMessage(member));
         }
-
+        
         /// <summary>
         /// Is the Restriction present in the member?
         /// </summary>
@@ -94,16 +83,17 @@ namespace ModTool.Shared.Verification
             return false;
         }     
                 
-        private bool PresentInMethodRecursive(MethodReference method, List<string> excludedAssemblies)
+        private bool PresentInMethodRecursive(MethodReference method)
         {
             HashSet<string> visited = new HashSet<string>();
-            return PresentInMethodRecursive(method, excludedAssemblies, visited);
+
+            return PresentInMethodRecursive(method, visited);
         }
 
-        private bool PresentInMethodRecursive(MethodReference method, List<string> apiAssemblies, HashSet<string> visited)
+        private bool PresentInMethodRecursive(MethodReference method, HashSet<string> visited)
         {
             MethodDefinition resolvedMethod = null;
-            
+
             try
             {
                 resolvedMethod = method.Resolve();
@@ -133,18 +123,18 @@ namespace ModTool.Shared.Verification
                 {
                     if (instruction.Operand == null)
                         continue;
-                                        
+
                     if (instruction.Operand is MemberReference)
                     {
                         MemberReference member = instruction.Operand as MemberReference;
-                        
+
                         if (member.Module.Assembly.Name.Name == "ModTool.Interface")
                             continue;
 
                         if (Present(member))
                             return true;
 
-                        if (apiAssemblies.Contains(member.Module.Assembly.Name.Name))
+                        if (CodeSettings.apiAssemblies.Contains(member.Module.Assembly.Name.Name))
                             continue;
 
                         if (member.DeclaringType == null)
@@ -155,10 +145,10 @@ namespace ModTool.Shared.Verification
 
                         if (member.DeclaringType.Namespace.StartsWith("Unity"))
                             continue;
-                        
+
                         if (member is MethodReference)
                         {
-                            if (PresentInMethodRecursive(member as MethodReference, apiAssemblies, visited))
+                            if (PresentInMethodRecursive(member as MethodReference, visited))
                                 return true;
                         }
                     }
@@ -166,15 +156,16 @@ namespace ModTool.Shared.Verification
             }
 
             return false;
-        }
-                
+        }        
+
         /// <summary>
-        /// Log this Restriction's message.
+        /// Get a Restriction message for a MemberReference.
         /// </summary>
-        /// <param name="member">The Member to include in the message.</param>
-        protected virtual void LogMessage(MemberReference member)
+        /// <param name="member"></param>
+        /// <returns></returns>
+        protected virtual string GetMessage(MemberReference member)
         {
-            LogUtility.LogWarning(restrictionMode + ": " + member.FullName + " - " + message);
+            return string.Format("{0}: {1} - {2}", restrictionMode, member.FullName, message);
         }
                 
         /// <summary>

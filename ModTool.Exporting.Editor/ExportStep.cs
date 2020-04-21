@@ -124,7 +124,17 @@ namespace ModTool.Exporting.Editor
                     assemblies.Add(scriptAssemblyFile);                
             }
 
-            return AssemblyVerifier.VerifyAssemblies(assemblies);
+            List<string> messages = new List<string>();
+
+            AssemblyVerifier.VerifyAssemblies(assemblies, messages);
+
+            foreach (var message in messages)
+                LogUtility.LogWarning(message);
+
+            if (messages.Count > 0)
+                return false;
+
+            return true;            
         }
 
         [MenuItem("Tools/ModTool/Verify")]

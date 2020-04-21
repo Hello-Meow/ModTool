@@ -242,11 +242,19 @@ namespace ModTool
 
         private void VerifyAssemblies()
         {
-            if (!AssemblyVerifier.VerifyAssemblies(assemblyFiles))
+            List<string> messages = new List<string>();
+
+            AssemblyVerifier.VerifyAssemblies(assemblyFiles, messages);
+
+            if(messages.Count > 0)
             {
                 SetInvalid();
+
                 LogUtility.LogWarning("Incompatible assemblies found for Mod: " + name);
-            }
+
+                foreach (var message in messages)
+                    LogUtility.LogWarning(message);
+            }          
         }
 
         private void LoadAssemblies()

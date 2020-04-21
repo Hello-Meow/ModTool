@@ -25,29 +25,24 @@ namespace ModTool.Shared.Verification
         }
         
         /// <summary>
-        /// Verify a list of Assembly files. 
+        /// Verify a list of assemblies.
         /// </summary>
-        /// <param name="assemblies">A collection of paths to Assemblies that will be verified.</param>
-        /// <returns>False if an assembly has failed.</returns>
-        public static bool VerifyAssemblies(IEnumerable<string> assemblies)
+        /// <param name="assemblies">A list of paths of assemblies.</param>
+        /// <param name="messages">A list of messages of failed Restrictions.</param>
+        public static void VerifyAssemblies(IEnumerable<string> assemblies, List<string> messages)
         {
             if (!initialized)
                 Initialize();
 
             foreach (var path in assemblies)
-            {                
-                if (!VerifyAssembly(path))
-                    return false;
-            }
+                VerifyAssembly(path, messages);
+        }        
 
-            return true;
-        }
-
-        private static bool VerifyAssembly(string path)
+        private static void VerifyAssembly(string path, List<string> messages)
         {
             AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(path);
-
-            foreach (ModuleDefinition module in assembly.Modules)
+            
+            foreach(var module in assembly.Modules)
             {
                 DefaultAssemblyResolver resolver = (DefaultAssemblyResolver)module.AssemblyResolver;
 
@@ -55,23 +50,15 @@ namespace ModTool.Shared.Verification
 
                 AddSearchDirectories(resolver);
 
-                if (!VerifyModule(module))
-                    return false;
+                VerifyModule(module, messages);
             }
+        }                
 
-            return true;
-        }
-
-        private static bool VerifyModule(ModuleDefinition module)
-        {            
-            foreach (TypeDefinition type in module.Types)
-            {
-                if (!VerifyType(type))
-                    return false;
-            }
-
-            return true;
-        }
+        private static void VerifyModule(ModuleDefinition module, List<string> messages)
+        {
+            foreach (var type in module.Types)
+                VerifyType(type, messages);
+        }               
 
         private static void AddSearchDirectories(BaseAssemblyResolver resolver)
         {
@@ -99,65 +86,50 @@ namespace ModTool.Shared.Verification
             if (platform == RuntimePlatform.Android)
                 resolver.AddSearchDirectory(Path.Combine(persistentDataPath, "Assemblies"));
         }
-        
-        private static bool VerifyType(TypeDefinition type)
+
+        private static void VerifyType(TypeDefinition type, List<string> messages)
         {
             foreach (var restriction in CodeSettings.inheritanceRestrictions)
-                if (!restriction.Verify(type, CodeSettings.apiAssemblies))
-                    return false;
+                restriction.Verify(type, messages);                
 
             foreach (var member in type.Fields)
             {
                 foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.typeRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.memberRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
             }
 
             foreach (var member in type.Properties)
             {
                 foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.typeRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.memberRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
             }
 
             foreach (var member in type.Methods)
             {
                 foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.typeRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
 
                 foreach (var restriction in CodeSettings.memberRestrictions)
-                    if (!restriction.Verify(member, CodeSettings.apiAssemblies))
-                        return false;
+                    restriction.Verify(member, messages);
             }
 
-            foreach(var nested in type.NestedTypes)
-            {
-                if(!VerifyType(nested))
-                    return false;                
-            }
-
-            return true;
-        } 
+            foreach (var nested in type.NestedTypes)            
+                VerifyType(nested, messages);
+        }        
     }
 }
