@@ -68,17 +68,30 @@ namespace ModTool.Editor
             SetPluginEnabled(exporterPath, true);
 
             List<string> assemblyPaths = new List<string>();
+                        
+            try
+            {
+                AssetDatabase.StartAssetEditing();
 
-            GetApiAssemblies("Assets", assemblyPaths);
-            GetApiAssemblies("Library", assemblyPaths);
+                GetApiAssemblies("Assets", assemblyPaths);
+                GetApiAssemblies("Library", assemblyPaths);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+            }
+
+            //TODO: test this
+            foreach (string assemblyPath in assemblyPaths)
+                UpdateGUID(assemblyPath);
 
             assetPaths.AddRange(assemblyPaths);
-
+            
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName);
 
             foreach (string assemblyPath in assemblyPaths)
                 AssetDatabase.DeleteAsset(assemblyPath);
-
+           
             SetPluginEnabled(exporterPath, false);
 
             if(revealPackage)
@@ -108,11 +121,26 @@ namespace ModTool.Editor
                 string newPath = Path.Combine(modToolDirectory, fileName);
 
                 File.Copy(assemblyPath, newPath, true);
-                AssetDatabase.ImportAsset(newPath);
 
+                //TODO: useless error because of duplicate names for assembly definition and imported assembly
+                AssetDatabase.ImportAsset(newPath);
+                
                 assemblies.Add(newPath);
             }            
         }   
+
+        private static void UpdateGUID(string path)
+        {
+            string[] lines = File.ReadAllLines(path + ".meta");
+
+            string guid = Path.GetFileNameWithoutExtension(path).ToLower();
+
+            guid = guid.GetHashCode().ToString("x32");
+            
+            lines[1] = "guid: " + guid;
+
+            File.WriteAllLines(path + ".meta", lines);
+        }
         
         private static void UpdateSettings()
         {
