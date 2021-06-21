@@ -184,12 +184,12 @@
             A class for verifying Assembly files based on a number of Restrictions.
             </summary>
         </member>
-        <member name="M:ModTool.Shared.Verification.AssemblyVerifier.VerifyAssemblies(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:ModTool.Shared.Verification.AssemblyVerifier.VerifyAssemblies(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.List{System.String})">
             <summary>
-            Verify a list of Assembly files. 
+            Verify a list of assemblies.
             </summary>
-            <param name="assemblies">A collection of paths to Assemblies that will be verified.</param>
-            <returns>False if an assembly has failed.</returns>
+            <param name="assemblies">A list of paths of assemblies.</param>
+            <param name="messages">A list of messages of failed Restrictions.</param>
         </member>
         <member name="T:ModTool.Shared.Verification.Restriction">
             <summary>
@@ -224,8 +224,7 @@
             Verify a member with this Restriction.
             </summary>
             <param name="member">A member.</param>
-            <param name="excludedAssemblies">A List of Assembly names that should be ignored.</param>
-            <returns>False if the Member fails the verification.</returns>
+            <param name="messages">A list of messages of failed Restrictions.</param>
         </member>
         <member name="M:ModTool.Shared.Verification.Restriction.Present(Mono.Cecil.MemberReference)">
             <summary>
@@ -241,11 +240,12 @@
             <param name="variable">A local variable</param>
             <returns>True if the restriction is present in the local variable.</returns>
         </member>
-        <member name="M:ModTool.Shared.Verification.Restriction.LogMessage(Mono.Cecil.MemberReference)">
+        <member name="M:ModTool.Shared.Verification.Restriction.GetMessage(Mono.Cecil.MemberReference)">
             <summary>
-            Log this Restriction's message.
+            Get a Restriction message for a MemberReference.
             </summary>
-            <param name="member">The Member to include in the message.</param>
+            <param name="member"></param>
+            <returns></returns>
         </member>
         <member name="M:ModTool.Shared.Verification.Restriction.Applicable(Mono.Cecil.MemberReference)">
             <summary>
