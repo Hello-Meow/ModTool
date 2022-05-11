@@ -66,7 +66,7 @@ namespace ModTool.Exporting.Editor
         public Asset(string assetPath)
         {
             _assetPath = assetPath;
-            _originalPath = assetPath;
+            _originalPath = assetPath;            
         }
 
         public void Backup()
@@ -78,6 +78,7 @@ namespace ModTool.Exporting.Editor
                 Directory.CreateDirectory(backupDirectory);
 
             File.Copy(assetPath, backupPath);
+            File.Copy(assetPath + ".meta", backupPath + ".meta");
 
             _originalPath = assetPath;
         }
@@ -90,8 +91,9 @@ namespace ModTool.Exporting.Editor
             AssetDatabase.DeleteAsset(assetPath);
 
             _assetPath = originalPath;
-            
+
             File.Copy(backupPath, assetPath, true);
+            File.Copy(backupPath + ".meta", assetPath + ".meta", true);
         }
 
         public void SetAssetBundle(string assetBundleName, string assetBundleVariant = "")
@@ -129,6 +131,7 @@ namespace ModTool.Exporting.Editor
         {
             //Note: AssetDatabase.DeleteAsset updates the asset database, which can trigger an unwanted compilation/script reload
             File.Delete(assetPath);
+            File.Delete(assetPath + ".meta");
         }
     }
 }
