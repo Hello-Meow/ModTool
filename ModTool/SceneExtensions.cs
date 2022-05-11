@@ -16,8 +16,8 @@ namespace ModTool
         public static void Unload(this Scene self)
         {
             if (self.isLoaded && self.IsValid())
-            {
-                SceneManager.UnloadScene(self.name);
+            {                
+                SceneManager.UnloadSceneAsync(self);
             }
         }
 
@@ -97,6 +97,23 @@ namespace ModTool
         /// <summary>
         /// Get all Components of type componentType in this Scene.
         /// </summary>
+        /// <typeparam name="T">A Type that derives from Component</typeparam>
+        /// <param name="self">A Scene instance.</param>
+        /// <param name="components">A List to populate with the found Components.</param>
+        public static void GetComponentsInScene<T>(this Scene self, List<T> components) where T : Component
+        {
+            if (!self.isLoaded || !self.IsValid())
+                return;
+            
+            foreach (GameObject go in self.GetRootGameObjects())
+            {
+                components.AddRange(go.GetComponentsInChildren<T>(true));
+            }
+        }
+
+        /// <summary>
+        /// Get all Components of type componentType in this Scene.
+        /// </summary>
         /// <param name="self">A Scene Instance.</param>
         /// <param name="componentType">A Type that derives from Component.</param>
         /// <returns>An array of found Components of Type componentType.</returns>
@@ -115,6 +132,21 @@ namespace ModTool
             }
 
             return components.ToArray();
+        }
+
+        /// <summary>
+        /// Get all Components of type componentType in this Scene.
+        /// </summary>
+        /// <param name="self">A Scene Instance.</param>
+        /// <param name="componentType">A Type that derives from Component.</param>
+        /// <param name="components">A List to populate with the found Components.</param>
+        public static void GetComponentsInScene(this Scene self, System.Type componentType, List<Component> components)
+        {
+            if (!self.isLoaded || !self.IsValid())
+                return;
+
+            foreach (GameObject go in self.GetRootGameObjects())
+                components.AddRange(go.GetComponentsInChildren(componentType, true));           
         }
 
         /// <summary>

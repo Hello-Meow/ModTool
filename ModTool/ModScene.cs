@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using ModTool.Interface;
@@ -114,6 +115,16 @@ namespace ModTool
                 return new T[0];
 
             return scene.Value.GetComponentsInScene<T>();
-        }        
+        }
+
+        /// <summary>
+        /// Returns all Components of type T in this Scene.
+        /// </summary>
+        /// <typeparam name="T">The Component that will be looked for.</typeparam>
+        /// <param name="components">A List that will be filled with found Components.</param>
+        public void GetComponentsInScene<T>(List<T> components) where T : Component
+        {
+            scene.Value.GetComponentsInScene(components);
+        }
     }
 }

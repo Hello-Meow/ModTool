@@ -603,6 +603,17 @@ namespace ModTool
 
             return components.ToArray();
         }
+
+        /// <summary>
+        /// Get all Components of type T in all prefabs.
+        /// </summary>
+        /// <typeparam name="T">The Component that will be looked for.</typeparam>
+        /// <param name="components">A List that will be populated with the found Components.</param>
+        public void GetComponentsInPrefabs<T>(List<T> components) where T : Component
+        {
+            foreach (GameObject prefab in prefabs)
+                prefab.GetComponentsInChildren(components);
+        }
         
         /// <summary>
         /// Get all Components of type T in all loaded ModScenes.
@@ -622,6 +633,17 @@ namespace ModTool
             }
 
             return components.ToArray();
+        }
+
+        /// <summary>
+        /// Get all Components of type T in all loaded ModScenes.
+        /// </summary>
+        /// <typeparam name="T">The Component that will be looked for.</typeparam>
+        /// <param name="components">A List that will be populated with the found Components.</param>
+        public void GetComponentsInScenes<T>(List<T> components) where T : Component
+        {            
+            foreach (ModScene scene in _scenes)
+                scene.GetComponentsInScene(components);
         }
         
         /// <summary>
