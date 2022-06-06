@@ -2,21 +2,32 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.Threading;
+using UnityEngine;
 
 namespace ModTool
 {
     /// <summary>
-    /// Singleton Component for dispatching Coroutines and Actions on the main Thread.
+    /// Dispatcher for running Coroutines and Actions on the main Thread.
     /// </summary>
-    internal class Dispatcher : UnitySingleton<Dispatcher>
+    internal class Dispatcher : MonoBehaviour
     {
-        private readonly Queue<Action> _executionQueue = new Queue<Action>();
-        private Thread main;
+        private static Dispatcher instance;
 
-        protected override void Awake()
+        private static readonly Queue<Action> _executionQueue = new Queue<Action>();
+
+        private static Thread main;
+
+        [RuntimeInitializeOnLoadMethod]
+        private static void Initialize()
         {
-            base.Awake();
+            var go = new GameObject("Dispatcher");
+            instance = go.AddComponent<Dispatcher>();
 
+            DontDestroyOnLoad(go);
+        }
+
+        void Awake()
+        {
             main = Thread.CurrentThread;
         }
 
@@ -25,10 +36,9 @@ namespace ModTool
             ProcessQueue();
         }
         
-        protected override void OnDestroy()
+        void OnDestroy()
         {
             ProcessQueue();
-            base.OnDestroy();
         }
 
         private void ProcessQueue()
@@ -43,25 +53,12 @@ namespace ModTool
         }
 
         /// <summary>
-        /// Enqueue a Coroutine.
-        /// </summary>
-        /// <param name="routine"></param>
-        public void Enqueue(IEnumerator routine)
-        {
-            Enqueue(() =>
-            {
-                StartCoroutine(routine);
-            });            
-        }
-
-        /// <summary>
         /// Enqueue an action on the main Thread.
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="delayCall"></param>
-        public void Enqueue(Action action, bool delayCall = false)
+        /// <param name="action">The action.</param>
+        /// <param name="delayCall">If we already are on the main thread, enqueue and delay the call anyways.</param>
+        public static void Enqueue(Action action, bool delayCall = true)
         {
-            //Don't queue if we're on the main thread.
             if (Thread.CurrentThread == main && !delayCall)
             {
                 action.Invoke();
@@ -69,9 +66,26 @@ namespace ModTool
             }
 
             lock (_executionQueue)
-            {
-                _executionQueue.Enqueue(action);
-            }
-        }        
+                _executionQueue.Enqueue(action);            
+        }
+        
+        /// <summary>
+        /// Starts a coroutine.
+        /// </summary>
+        /// <param name="routine"></param>
+        /// <returns></returns>
+        public static new Coroutine StartCoroutine(IEnumerator routine)
+        {
+            return (instance as MonoBehaviour).StartCoroutine(routine);
+        }
+
+        /// <summary>
+        /// Stops a coroutine.
+        /// </summary>
+        /// <param name="routine"></param>
+        public static new void StopCoroutine(Coroutine routine)
+        {
+             (instance as MonoBehaviour).StopCoroutine(routine);
+        }
     }
 }

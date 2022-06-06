@@ -1,66 +1,62 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using UnityEngine;
-using ModTool.Shared;
 
 namespace ModTool
 {
-    internal class AssetBundleResource : Resource
+    internal class AssetBundleResource : Resource<AssetBundleResource>
     {
         public string path { get; private set; }
         
         public AssetBundle assetBundle { get; private set; }
 
-        public ReadOnlyCollection<string> assetPaths { get; private set; }
+        public IReadOnlyList<string> assetPaths { get; private set; }
 
-        public override bool canLoad
-        {
-            get
-            {
-                return _canLoad;
-            }
-        }
+        public override bool canLoad => errors.Count == 0;
 
-        private bool _canLoad;
+        private string manifestPath;
 
         public AssetBundleResource(string name, string path) : base(name)
         {
             this.path = path;
 
-            _canLoad = false;
+            manifestPath = path + ".manifest";
 
             GetAssetPaths();
         }
 
         protected override IEnumerator LoadResources()
         {
-            assetBundle = AssetBundle.LoadFromFile(path);
+            AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromFileAsync(path);
+
+            while (!assetBundleCreateRequest.isDone)
+            {
+                progress = assetBundleCreateRequest.progress;
+                yield return null;
+            }
+
+            assetBundle = assetBundleCreateRequest.assetBundle;            
+        }
+
+        protected override IEnumerator UnloadResources()
+        {
+            if(assetBundle != null)
+                assetBundle.Unload(true);
+            
+            assetBundle = null;
 
             yield break;
         }
 
-        protected override IEnumerator LoadResourcesAsync()
+        private void CheckFiles()
         {
-            AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromFileAsync(path);
-            
-            while(!assetBundleCreateRequest.isDone)
-            {
-                loadProgress = assetBundleCreateRequest.progress;
-                yield return null;
-            }
+            if (!File.Exists(path))            
+                AddError(name + " asset bundle is missing");             
 
-            assetBundle = assetBundleCreateRequest.assetBundle;
-        }
-
-        protected override void UnloadResources()
-        {
-            if(assetBundle != null)
-                assetBundle.Unload(true);
-
-            assetBundle = null;
+            if (!File.Exists(manifestPath))            
+                AddError(name + " manifest is missing");
         }
 
         private void GetAssetPaths()
@@ -69,22 +65,11 @@ namespace ModTool
 
             this.assetPaths = assetPaths.AsReadOnly();
 
-            if (string.IsNullOrEmpty(path))
+            CheckFiles();
+
+            if (!canLoad)
                 return;
-
-            if (!File.Exists(path))
-                return;
-
-            string manifestPath = path + ".manifest";
-
-            if (!File.Exists(manifestPath))
-            {
-                LogUtility.LogWarning(name + " manifest missing");
-                return;
-            }
-
-            _canLoad = true;
-
+                        
             //TODO: long lines in manifest are formatted?
             string[] lines = File.ReadAllLines(manifestPath);
 

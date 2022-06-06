@@ -2,15 +2,15 @@
 namespace ModTool.Interface
 {
     /// <summary>
-    /// Provides methods for handling loading and unloading of mods.
+    /// Interface to be implemented by mods that wish to receive OnLoaded and OnUnloaded calls. 
+    /// Non-UnityEngine.Object types that implement this interface will be instantiated when the Mod loads.
     /// </summary>
     public interface IModHandler
     {
         /// <summary>
         /// Called when the Mod is loaded.
         /// </summary>
-        /// <param name="contentHandler">The Mod's ContentHandler.</param>
-        void OnLoaded(ContentHandler contentHandler);
+        void OnLoaded();
 
         /// <summary>
         /// Called when the Mod is unloaded.

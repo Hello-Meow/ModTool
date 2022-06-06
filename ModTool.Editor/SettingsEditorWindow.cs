@@ -1,11 +1,13 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using ModTool.Shared;
-using ModTool.Shared.Editor;
 
 namespace ModTool.Editor
 {
-    internal class SettingsEditorWindow : EditorWindow
+    /// <summary>
+    /// ModTool's settings window.
+    /// </summary>
+    public class SettingsEditorWindow : EditorWindow
     {
         private ModToolSettings modToolSettings;
         private CodeSettings codeSettings;
@@ -15,7 +17,10 @@ namespace ModTool.Editor
 
         Vector2 scrollPos = Vector2.zero;
 
-        [MenuItem("Tools/ModTool/Settings")]
+        /// <summary>
+        /// Open ModTool's settings window.
+        /// </summary>
+        [MenuItem("Tools/ModTool/Settings", priority = 0)]
         public static void ShowWindow()
         {
             SettingsEditorWindow window = GetWindow<SettingsEditorWindow>();

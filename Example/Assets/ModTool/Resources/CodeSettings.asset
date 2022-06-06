@@ -11,62 +11,17 @@ MonoBehaviour:
   m_Script: {fileID: 562734972, guid: b981ac5fea65cbf46ab728daad9c9206, type: 3}
   m_Name: CodeSettings
   m_EditorClassIdentifier: 
-  _inheritanceRestrictions:
-  - message: Please use ModTool.Interface.ModBehaviour instead of MonoBehaviour.
-    applicableBaseType:
-      nameSpace: UnityEngine
-      name: MonoBehaviour
-    restrictionMode: 1
-    type:
-      nameSpace: ModTool.Interface
-      name: ModBehaviour
-  _memberRestrictions:
-  - message: Please use ModBehaviour.Instantiate or ContentHandler.Instantiate instead
-      to ensure proper object creation.
-    applicableBaseType:
-      nameSpace: 
-      name: 
-    restrictionMode: 0
-    memberName:
-      type:
-        nameSpace: UnityEngine
-        name: Object
-      name: Instantiate
-  - message: Please use ModBehaviour.AddComponent or ContentHandler.AddComponent instead
-      to ensure proper component handling.
-    applicableBaseType:
-      nameSpace: 
-      name: 
-    restrictionMode: 0
-    memberName:
-      type:
-        nameSpace: UnityEngine
-        name: GameObject
-      name: AddComponent
-  - message: Creating new GameObjects is not allowed
-    applicableBaseType:
-      nameSpace: 
-      name: 
-    restrictionMode: 0
-    memberName:
-      type:
-        nameSpace: UnityEngine
-        name: GameObject
-      name: .ctor
+  _inheritanceRestrictions: []
+  _memberRestrictions: []
   _typeRestrictions: []
   _namespaceRestrictions:
   - message: Reflection is not allowed.
-    applicableBaseType:
-      nameSpace: 
-      name: 
+    targetType: 
     restrictionMode: 0
     nameSpace: System.Reflection
     includeNested: 1
   - message: IO is not allowed.
-    applicableBaseType:
-      nameSpace: 
-      name: 
+    targetType: 
     restrictionMode: 0
     nameSpace: System.IO
     includeNested: 1
-  _apiAssemblies: []

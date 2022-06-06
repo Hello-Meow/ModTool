@@ -19,7 +19,7 @@ namespace ModTool.Shared.Verification
         /// <summary>
         /// The base type to which the Restriction will be applied.
         /// </summary>
-        public TypeName applicableBaseType;
+        public string targetType;
 
         /// <summary>
         /// Does the Restriction require or prohibit the use of something?
@@ -29,12 +29,12 @@ namespace ModTool.Shared.Verification
         /// <summary>
         /// Initialize a new Restriction.
         /// </summary>
-        /// <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+        /// <param name="targetType">The base Type this Restriction will apply to.</param>
         /// <param name="message">The Message that will be shown upon failing the Restriction.</param>
         /// <param name="restrictionMode">Should it be required or prohibited?</param>
-        protected Restriction(TypeName applicableBaseType, string message, RestrictionMode restrictionMode)
+        protected Restriction(string targetType, string message, RestrictionMode restrictionMode)
         {
-            this.applicableBaseType = applicableBaseType;
+            this.targetType = targetType;
             this.message = message;
             this.restrictionMode = restrictionMode;
         }
@@ -133,10 +133,7 @@ namespace ModTool.Shared.Verification
 
                         if (Present(member))
                             return true;
-
-                        if (CodeSettings.apiAssemblies.Contains(member.Module.Assembly.Name.Name))
-                            continue;
-
+                                                
                         if (member.DeclaringType == null)
                             continue;
 
@@ -144,6 +141,9 @@ namespace ModTool.Shared.Verification
                             continue;
 
                         if (member.DeclaringType.Namespace.StartsWith("Unity"))
+                            continue;
+
+                        if (AssemblyUtility.IsShared(member.Module.Assembly.Name.Name))
                             continue;
 
                         if (member is MethodReference)
@@ -193,15 +193,15 @@ namespace ModTool.Shared.Verification
         /// <returns>True if the Restriction is applicable.</returns>
         protected bool Applicable(TypeReference type)
         {
-            if (applicableBaseType == null)
+            if (targetType == null)
                 return true;
 
-            if (string.IsNullOrEmpty(applicableBaseType.name))
+            if (string.IsNullOrEmpty(targetType))
                 return true;
 
             try
             {
-                return type.Resolve().IsSubClassOf(applicableBaseType);
+                return type.Resolve().IsSubClassOf(targetType);
             }
             catch (AssemblyResolutionException e)
             {
@@ -233,10 +233,10 @@ namespace ModTool.Shared.Verification
         /// </summary>
         /// <param name="nameSpace">The namespace that will be checked for this restriction.</param>
         /// <param name="includeNested">Should nested namespaces be restricted as well?</param>
-        /// <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+        /// <param name="targetType">The base Type this Restriction will apply to.</param>
         /// <param name="message">The Message that will be shown upon failing the Restriction.</param>
         /// <param name="restrictionMode">Should it be required or prohibited?</param>
-        public NamespaceRestriction(string nameSpace, bool includeNested, TypeName applicableBaseType, string message, RestrictionMode restrictionMode) : base(applicableBaseType, message, restrictionMode)
+        public NamespaceRestriction(string nameSpace, bool includeNested, string targetType, string message, RestrictionMode restrictionMode) : base(targetType, message, restrictionMode)
         {
             this.nameSpace = nameSpace;
             this.includeNested = includeNested;
@@ -280,17 +280,17 @@ namespace ModTool.Shared.Verification
         /// <summary>
         /// The Type that will be checked for this Restriction.
         /// </summary>
-        public TypeName type;
+        public string type;
 
         /// <summary>
         /// Initialize a new TypeRestriction.
         /// </summary>
         /// <param name="type">The Type that will be checked for this Restriction.</param>
-        /// <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+        /// <param name="targetType">The base Type this Restriction will apply to.</param>
         /// <param name="message">The Message that will be shown upon failing the Restriction.</param>
         /// <param name="restrictionMode">Should it be required or prohibited?</param>
-        public TypeRestriction(TypeName type, TypeName applicableBaseType, string message, RestrictionMode restrictionMode)
-            : base(applicableBaseType, message, restrictionMode)
+        public TypeRestriction(string type, string targetType, string message, RestrictionMode restrictionMode)
+            : base(targetType, message, restrictionMode)
         {
             this.type = type;
         }
@@ -300,25 +300,25 @@ namespace ModTool.Shared.Verification
             if (member is FieldReference)
             {
                 FieldReference field = member as FieldReference;
-                return field.FieldType.Name == type.name && field.FieldType.Namespace == type.nameSpace;
+                return field.FieldType.GetFullName() == type;
             }
 
             if (member is PropertyReference)
             {
                 PropertyReference property = member as PropertyReference;
-                return property.PropertyType.Name == type.name && property.PropertyType.Namespace == type.nameSpace;
+                return property.PropertyType.GetFullName() == type;
             }
 
             if (member.DeclaringType == null)
                 return false;
 
-            return member.DeclaringType.Name == type.name && member.DeclaringType.Namespace == type.nameSpace;
+            return member.DeclaringType.GetFullName() == type;
         }
 
         protected override bool PresentMethodVariable(VariableReference variable)
         {
-            return (variable.VariableType.Name == type.name && variable.VariableType.Namespace == type.nameSpace);
-        }
+            return (variable.VariableType.GetFullName() == type);
+        }       
     }
 
     /// <summary>
@@ -330,17 +330,17 @@ namespace ModTool.Shared.Verification
         /// <summary>
         /// The Type that will be checked for this Restriction.
         /// </summary>
-        public TypeName type;
+        public string type;
 
         /// <summary>
         /// Initialize a new InheritanceRestriction.
         /// </summary>
         /// <param name="type">The Type that will be checked for this Restriction</param>
-        /// <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+        /// <param name="targetType">The base Type this Restriction will apply to.</param>
         /// <param name="message">The Message that will be shown upon failing the Restriction.</param>
         /// <param name="restrictionMode">Should it be required or prohibited?</param>
-        public InheritanceRestriction(TypeName type, TypeName applicableBaseType, string message, RestrictionMode restrictionMode)
-            : base(applicableBaseType, message, restrictionMode)
+        public InheritanceRestriction(string type, string targetType, string message, RestrictionMode restrictionMode)
+            : base(targetType, message, restrictionMode)
         {
             this.type = type;
         }
@@ -352,8 +352,6 @@ namespace ModTool.Shared.Verification
                 TypeDefinition typeDefinition = (member as TypeReference).Resolve();
                 return typeDefinition.IsSubClassOf(type);
             }
-
-            //TODO: What if a Type derives from Type inside Unity that derives from MonoBehaviour?
 
             return false;
         }
@@ -373,27 +371,24 @@ namespace ModTool.Shared.Verification
         /// <summary>
         /// The member that will be checked for this Restriction.
         /// </summary>
-        public MemberName memberName;
+        public string member;
 
         /// <summary>
         /// Initialize a new MemberRestriction.
         /// </summary>
-        /// <param name="memberName">The member that will be checked for this Restriction.</param>
-        /// <param name="applicableBaseType">The base Type this Restriction will apply to.</param>
+        /// <param name="member">The member that will be checked for this Restriction.</param>
+        /// <param name="targetType">The base Type this Restriction will apply to.</param>
         /// <param name="message">The Message that will be shown upon failing the Restriction.</param>
         /// <param name="restrictionMode">Should it be required or prohibited?</param>
-        public MemberRestriction(MemberName memberName, TypeName applicableBaseType, string message, RestrictionMode restrictionMode)
-            : base(applicableBaseType, message, restrictionMode)
+        public MemberRestriction(string member, string targetType, string message, RestrictionMode restrictionMode)
+            : base(targetType, message, restrictionMode)
         {
-            this.memberName = memberName;
+            this.member = member;
         }
 
         protected override bool Present(MemberReference member)
         {
-            if (member.DeclaringType == null)
-                return member.Name == memberName.name;
-
-            return (member.Name == memberName.name && member.DeclaringType.Name == memberName.type.name);
+            return member.GetFullName() == this.member;
         }
     }
 }

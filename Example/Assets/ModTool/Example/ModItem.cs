@@ -16,11 +16,9 @@ public class ModItem : MonoBehaviour {
     /// </summary>
     /// <param name="mod"></param>
     /// <param name="modMenu"></param>
-	public void Initialize(Mod mod, Transform menuContentPanel)
+	public void Initialize(Mod mod)
     {
         this.mod = mod;
-
-        transform.SetParent(menuContentPanel);
 
         modName.text = mod.name;
         modType.text = mod.contentType.ToString();

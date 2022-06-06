@@ -3,80 +3,79 @@ using System.IO;
 using System.Collections.Generic;
 using Mono.Cecil;
 
+using System.Reflection;
+
 namespace ModTool.Shared
 { 
-    /// <summary>
-    /// Filter mode for finding Assemblies.
-    /// </summary>
-    [Flags]
-    public enum AssemblyFilter { ApiAssemblies = 1, ModToolAssemblies = 2, ModAssemblies = 4 }
-    
     /// <summary>
     /// Utility for finding Assemblies.
     /// </summary>
     public class AssemblyUtility
     {
-        /// <summary>
-        /// Find dll files in a directory and its sub directories.
-        /// </summary>
-        /// <param name="path">The directory to search in.</param>
-        /// <returns>A List of paths to found Assemblies.</returns>
-        public static List<string> GetAssemblies(string path, AssemblyFilter assemblyFilter)
+        public static List<string> GetAssemblies(string path, Func<string, bool> filter = null)
         {
             List<string> assemblies = new List<string>();
 
-            GetAssemblies(assemblies, path, assemblyFilter);
+            GetAssemblies(assemblies, path, filter);
 
             return assemblies;
         }
 
-        public static void GetAssemblies(List<string> assemblies, string path, AssemblyFilter assemblyFilter)
+        public static void GetAssemblies(List<string> assemblies, string path, Func<string, bool> filter = null)
         {
             var assemblyFiles = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
 
             foreach (var assembly in assemblyFiles)
             {
-                AssemblyDefinition assemblyDefinition;
+                AssemblyName assemblyName;
 
                 try
                 {
-                    assemblyDefinition = Mono.Cecil.AssemblyDefinition.ReadAssembly(assembly);
+                    assemblyName = AssemblyName.GetAssemblyName(assembly);                    
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     LogUtility.LogDebug(e.Message);
                     continue;
                 }
 
-                string name = assemblyDefinition.Name.Name;
+                string name = assemblyName.Name;
 
-                if (name == "ModTool" || name.StartsWith("ModTool."))
-                {
-                    if ((assemblyFilter & AssemblyFilter.ModToolAssemblies) != 0)
-                        assemblies.Add(assembly);
-
+                if (name == "ModTool" || name.StartsWith("ModTool."))                 
                     continue;
-                }
-                
-                if(name.Contains("Mono.Cecil"))
-                {
-                    if((assemblyFilter & AssemblyFilter.ModToolAssemblies) != 0)
-                        assemblies.Add(assembly);
 
+                if (IsShared(assembly))                
+                    continue;                
+
+                if (assembly.Contains("Editor"))
                     continue;
-                }
 
-                if(CodeSettings.apiAssemblies.Contains(name))
-                {
-                    if((assemblyFilter & AssemblyFilter.ApiAssemblies) != 0)
-                        assemblies.Add(assembly);
-
+                if(filter != null && !filter(assembly))
                     continue;
-                }
 
-                if ((assemblyFilter & AssemblyFilter.ModAssemblies) != 0)
-                    assemblies.Add(assembly);
+                assemblies.Add(assembly);
             }
-        }                 
+        }
+
+        /// <summary>
+        /// Is an assembly shared with the mod exporter?
+        /// </summary>
+        /// <param name="path">The assembly's file path.</param>
+        /// <returns>True if an assembly is shared with the mod exporter.</returns>
+        public static bool IsShared(string path)
+        {
+            string name = Path.GetFileNameWithoutExtension(path);
+
+            foreach (string sharedAsset in ModToolSettings.sharedAssets)
+            {
+                if (!sharedAsset.EndsWith(".asmdef") && !sharedAsset.EndsWith(".dll"))
+                    continue;
+
+                if (Path.GetFileNameWithoutExtension(sharedAsset) == name)
+                    return true;
+            }
+
+            return false;
+        }
     }    
 }

@@ -1,135 +1,113 @@
 ﻿using System.Collections.Generic;
 using Mono.Cecil;
-using UnityEngine;
-using System.IO;
+using System;
 
 namespace ModTool.Shared.Verification
 {
     /// <summary>
     /// A class for verifying Assembly files based on a number of Restrictions.
     /// </summary>
-    public class AssemblyVerifier
+    public class AssemblyVerifier : IDisposable
     {
-        private static string persistentDataPath;
-        private static RuntimePlatform platform;
-        private static bool initialized;
+        private IAssemblyResolver assemblyResolver;
 
-        [RuntimeInitializeOnLoadMethod]
-        private static void Initialize()
+        private ReaderParameters parameters;
+
+        public AssemblyVerifier()
         {
-            //Note: These can only be called on the main thread.
-            persistentDataPath = Application.persistentDataPath;
-            platform = Application.platform;
-            
-            initialized = true;
+            assemblyResolver = new AssemblyResolver();
+
+            Initialize();
         }
         
         /// <summary>
-        /// Verify a list of assemblies.
+        /// Initialize an AssemblyVerifier with a specified IAssemblyResolver.
         /// </summary>
-        /// <param name="assemblies">A list of paths of assemblies.</param>
-        /// <param name="messages">A list of messages of failed Restrictions.</param>
-        public static void VerifyAssemblies(IEnumerable<string> assemblies, List<string> messages)
+        /// <param name="assemblyResolver"></param>
+        public AssemblyVerifier(IAssemblyResolver assemblyResolver)
         {
-            if (!initialized)
-                Initialize();
+            this.assemblyResolver = assemblyResolver;
 
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            parameters = new ReaderParameters()
+            {
+                AssemblyResolver = assemblyResolver,
+                InMemory = true
+            };
+        }
+
+        /// <summary>
+        /// Verify a collection of assemblies.
+        /// </summary>
+        /// <param name="assemblies">A list of assembly file paths.</param>
+        /// <param name="messages">List of messages from failed restrictions.</param>
+        public void VerifyAssemblies(IEnumerable<string> assemblies, List<string> messages)
+        {
             foreach (var path in assemblies)
                 VerifyAssembly(path, messages);
-        }        
+        }
 
-        private static void VerifyAssembly(string path, List<string> messages)
+        /// <summary>
+        /// Verify an assembly.
+        /// </summary>
+        /// <param name="path">The file path of the assembly.</param>
+        /// <param name="messages">List of messages from failed restrictions.</param>
+        public void VerifyAssembly(string path, List<string> messages)
         {
-            AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(path);
-            
-            foreach(var module in assembly.Modules)
+            try
             {
-                DefaultAssemblyResolver resolver = (DefaultAssemblyResolver)module.AssemblyResolver;
-
-                resolver.AddSearchDirectory(Path.GetDirectoryName(path));
-
-                AddSearchDirectories(resolver);
-
-                VerifyModule(module, messages);
+                using (var assembly = AssemblyDefinition.ReadAssembly(path, parameters))
+                    VerifyModule(assembly.MainModule, messages);
             }
-        }                
+            catch (Exception e)
+            {
+                messages.Add(e.ToString());
+            }
+        }
+
+        public void Dispose()
+        {
+            assemblyResolver.Dispose();
+        }
 
         private static void VerifyModule(ModuleDefinition module, List<string> messages)
         {
             foreach (var type in module.Types)
                 VerifyType(type, messages);
-        }               
-
-        private static void AddSearchDirectories(BaseAssemblyResolver resolver)
-        {
-            //Add search directories based on platform
-            if (platform == RuntimePlatform.WindowsEditor || platform == RuntimePlatform.OSXEditor)
-            {
-                resolver.AddSearchDirectory(Path.GetDirectoryName(typeof(UnityEngine.Object).Assembly.Location));
-                resolver.AddSearchDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Assets"));
-
-                foreach (string directory in Directory.GetDirectories(Directory.GetCurrentDirectory(), "ModTool", SearchOption.AllDirectories))
-                    resolver.AddSearchDirectory(directory);
-                
-                resolver.AddSearchDirectory(Directory.GetCurrentDirectory());
-            }
-
-            if (platform == RuntimePlatform.WindowsPlayer || platform == RuntimePlatform.LinuxPlayer || platform == RuntimePlatform.OSXPlayer)
-            {
-                foreach (string directory in Directory.GetDirectories(Directory.GetCurrentDirectory(), "Managed", SearchOption.AllDirectories))
-                    resolver.AddSearchDirectory(directory);
-                
-                resolver.AddSearchDirectory(Directory.GetCurrentDirectory());  
-            }
-
-            //android - extracted assemblies from apk in persistentDatapath/Assemblies
-            if (platform == RuntimePlatform.Android)
-                resolver.AddSearchDirectory(Path.Combine(persistentDataPath, "Assemblies"));
         }
 
         private static void VerifyType(TypeDefinition type, List<string> messages)
         {
             foreach (var restriction in CodeSettings.inheritanceRestrictions)
-                restriction.Verify(type, messages);                
+                restriction.Verify(type, messages);
 
             foreach (var member in type.Fields)
-            {
-                foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    restriction.Verify(member, messages);
-
-                foreach (var restriction in CodeSettings.typeRestrictions)
-                    restriction.Verify(member, messages);
-
-                foreach (var restriction in CodeSettings.memberRestrictions)
-                    restriction.Verify(member, messages);
-            }
+                VerifyMember(member, messages);
 
             foreach (var member in type.Properties)
-            {
-                foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    restriction.Verify(member, messages);
-
-                foreach (var restriction in CodeSettings.typeRestrictions)
-                    restriction.Verify(member, messages);
-
-                foreach (var restriction in CodeSettings.memberRestrictions)
-                    restriction.Verify(member, messages);
-            }
+                VerifyMember(member, messages);
 
             foreach (var member in type.Methods)
-            {
-                foreach (var restriction in CodeSettings.namespaceRestrictions)
-                    restriction.Verify(member, messages);
+                VerifyMember(member, messages);
 
-                foreach (var restriction in CodeSettings.typeRestrictions)
-                    restriction.Verify(member, messages);
-
-                foreach (var restriction in CodeSettings.memberRestrictions)
-                    restriction.Verify(member, messages);
-            }
-
-            foreach (var nested in type.NestedTypes)            
+            foreach (var nested in type.NestedTypes)
                 VerifyType(nested, messages);
-        }        
+        }
+
+        private static void VerifyMember(MemberReference member, List<string> messages)
+        {
+            foreach (var restriction in CodeSettings.namespaceRestrictions)
+                restriction.Verify(member, messages);
+
+            foreach (var restriction in CodeSettings.typeRestrictions)
+                restriction.Verify(member, messages);
+
+            foreach (var restriction in CodeSettings.memberRestrictions)
+                restriction.Verify(member, messages);
+        }
     }
 }

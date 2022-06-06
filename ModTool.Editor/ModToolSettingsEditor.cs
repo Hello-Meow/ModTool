@@ -1,6 +1,7 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
 using ModTool.Shared;
-
 
 namespace ModTool.Editor
 {
@@ -33,8 +34,36 @@ namespace ModTool.Editor
             _logLevel.intValue = (int)logLevel;
 
             EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label(ModToolSettings.sharedAssets.Count + " Shared Assets");
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("edit"))
+                    AssetSelector.Open();
+            }
+
+            GUILayout.Space(2);
+
+            EditorGUILayout.EndVertical();
+
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label(ModToolSettings.sharedPackages.Count + " Shared Packages");
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("edit"))
+                    PackageSelector.Open();
+            }
+
+            GUILayout.EndVertical();
 
             serializedObject.ApplyModifiedProperties();
-        }
+        }        
     }
 }

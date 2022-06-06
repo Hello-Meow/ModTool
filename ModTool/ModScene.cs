@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
-using ModTool.Interface;
 
 namespace ModTool
 {
     /// <summary>
     /// Represents a Scene that is included in a Mod.
     /// </summary>
-    public class ModScene : Resource
+    public class ModScene : Resource<ModScene>
     {
         /// <summary>
         /// This ModScene's Scene.
@@ -26,7 +25,7 @@ namespace ModTool
         /// </summary>
         public override bool canLoad
         {
-            get { return mod.loadState == ResourceLoadState.Loaded; }
+            get { return mod.loadState == LoadState.Loaded; }
         }
 
         /// <summary>
@@ -42,34 +41,23 @@ namespace ModTool
                   
         protected override IEnumerator LoadResources()
         {
-            //NOTE: Loading a scene synchronously prevents the scene from being initialized, so force async loading.
-            yield return LoadResourcesAsync();            
-        }
-                
-        protected override IEnumerator LoadResourcesAsync()
-        {
             AsyncOperation loadOperation = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
-            loadOperation.allowSceneActivation = false;
-
-            while (loadOperation.progress < .9f)
+            
+            while(!loadOperation.isDone)
             {
-                loadProgress = loadOperation.progress;
+                progress = loadOperation.progress;
                 yield return null;
             }
 
-            loadOperation.allowSceneActivation = true;
-
-            yield return loadOperation;
-            
             scene = SceneManager.GetSceneByName(name);
-                        
+
             SetActive();
         }
         
-        protected override void UnloadResources()
+        protected override IEnumerator UnloadResources()
         {
             if (scene.HasValue)
-                scene.Value.Unload();
+                yield return SceneManager.UnloadSceneAsync(scene.Value);
 
             scene = null;
         }
@@ -81,15 +69,7 @@ namespace ModTool
         {
             if (scene.HasValue)
                 SceneManager.SetActiveScene(scene.Value);
-        }
-
-        protected override void OnLoaded()
-        {           
-            foreach (IModHandler modHandler in GetComponentsInScene<IModHandler>())
-                modHandler.OnLoaded(mod.contentHandler);
-
-            base.OnLoaded();
-        }
+        }       
 
         /// <summary>
         /// Returns the first Component of type T in this Scene.
@@ -98,7 +78,7 @@ namespace ModTool
         /// <returns>An array of found Components of Type T.</returns>
         public T GetComponentInScene<T>()
         {
-            if (loadState != ResourceLoadState.Loaded)
+            if (loadState != LoadState.Loaded)
                 return default(T);
 
             return scene.Value.GetComponentInScene<T>();
@@ -111,7 +91,7 @@ namespace ModTool
         /// <returns>An array of found Components of Type T.</returns>
         public T[] GetComponentsInScene<T>()
         {
-            if (loadState != ResourceLoadState.Loaded)
+            if (loadState != LoadState.Loaded)
                 return new T[0];
 
             return scene.Value.GetComponentsInScene<T>();
@@ -122,7 +102,7 @@ namespace ModTool
         /// </summary>
         /// <typeparam name="T">The Component that will be looked for.</typeparam>
         /// <param name="components">A List that will be filled with found Components.</param>
-        public void GetComponentsInScene<T>(List<T> components) where T : Component
+        public void GetComponentsInScene<T>(List<T> components)
         {
             scene.Value.GetComponentsInScene(components);
         }

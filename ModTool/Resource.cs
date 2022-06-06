@@ -1,404 +1,227 @@
 ﻿using System;
 using System.Collections;
-using ModTool.Interface;
+using System.Collections.Generic;
+using UnityEngine;
+using ModTool.Shared;
 
 namespace ModTool
 {
     /// <summary>
-    /// Represents a load state.
+    /// Represents the load state of a Resource.
     /// </summary>
-    public enum ResourceLoadState { Unloaded, Loading, Loaded, Cancelling, Unloading }
+    public enum LoadState
+    {
+        /// <summary>
+        /// The resource is unloaded.
+        /// </summary>
+        Unloaded,
+
+        /// <summary>
+        /// The resource is loading.
+        /// </summary>
+        Loading,
+
+        /// <summary>
+        /// The resource is fully loaded.
+        /// </summary>
+        Loaded,
+
+        /// <summary>
+        /// The resource is unloading.
+        /// </summary>
+        Unloading
+    }
 
     /// <summary>
     /// A class that supports async loading of various resources.
     /// </summary>
-    public abstract class Resource : IResource
+    /// <typeparam name="T">Self referencing type of Resource</typeparam>
+    public abstract class Resource<T> : Resource where T : Resource<T>
     {
         /// <summary>
-        /// Occurs when this Resource has been loaded.
+        /// Occurs when the resource has completed loading.
+        /// </summary>
+        public new event Action<T> Loaded;
+
+        /// <summary>
+        /// Occurs when the resource has completed unloading.
+        /// </summary>
+        public new event Action<T> Unloaded;
+
+        /// <summary>
+        /// Make a new resource with a name.
+        /// </summary>
+        /// <param name="name"></param>
+        public Resource(string name) : base(name)
+        {
+            
+        }
+
+        protected override void OnLoaded()
+        {
+            base.OnLoaded();
+
+            Loaded?.Invoke(this as T);
+        }
+
+        protected override void OnUnloaded()
+        {
+            base.OnUnloaded();
+
+            Unloaded?.Invoke(this as T);
+        }
+    }
+
+
+    /// <summary>
+    /// A class that supports async loading of various resources.
+    /// </summary>
+    public abstract class Resource
+    {
+        /// <summary>
+        /// Occurs when the resource has completed loading.
         /// </summary>
         public event Action<Resource> Loaded;
 
         /// <summary>
-        /// Occurs when this Resource has been unloaded.
+        /// Occurs when the resource has completed unloading.
         /// </summary>
         public event Action<Resource> Unloaded;
 
         /// <summary>
-        /// Occurs when this Resource's async loading has been cancelled.
+        /// The current load state of the resource.
         /// </summary>
-        public event Action<Resource> LoadCancelled;
+        public LoadState loadState { get; private set; }
 
         /// <summary>
-        /// Occurs when this Resources async loading has been resumed.
-        /// </summary>
-        public event Action<Resource> LoadResumed;
-
-        /// <summary>
-        /// Occurs when this Resource's loadProgress changes.
-        /// </summary>
-        public event Action<float> LoadProgress;
-        
-        /// <summary>
-        /// This Resource's name.
+        /// The resource's name.
         /// </summary>
         public string name { get; private set; }
 
         /// <summary>
-        /// Is this Resource busy loading?
-        /// </summary>
-        public virtual bool isBusy { get { return _loadState.isBusy; } }
-
-        /// <summary>
-        /// Can this Resource be loaded?
+        /// Can this resource currently be loaded?
         /// </summary>
         public virtual bool canLoad { get { return true; } }
 
         /// <summary>
-        /// This Resource's current load state.
+        /// A value representing the loading progress ranging from 0 to 1.
         /// </summary>
-        public ResourceLoadState loadState { get { return _loadState.loadState; } }
+        public float progress { get; protected set; }
 
         /// <summary>
-        /// What is the Resource's load progress.
+        /// A collection of error messages related to this resource.
         /// </summary>
-        public float loadProgress
-        {
-            get
-            {
-                return _loadProgress;
-            }
-            protected set
-            {
-                if (value == _loadProgress)
-                    return;
+        public IReadOnlyList<string> errors { get; private set; }
 
-                _loadProgress = value;
-                LoadProgress?.Invoke(_loadProgress);
-            }
-        }
+        private List<string> _errors;
 
-        private LoadState _loadState;
-        private float _loadProgress = 0;
-        
-        /// <summary>
-        /// Initialize a Resource with a name.
-        /// </summary>
-        /// <param name="name">The Resource's name</param>
-        protected Resource(string name)
+        public Resource(string name)
         {
             this.name = name;
-            _loadState = new UnloadedState(this);
+
+            _errors = new List<string>();
+            errors = _errors.AsReadOnly();
         }
 
         /// <summary>
-        /// Load this Resource.
+        /// Load this resource.
         /// </summary>
         public void Load()
         {
-            Dispatcher.instance.Enqueue(LoadCoroutine());
+            if (!canLoad)
+                return;
+
+            if (loadState == LoadState.Unloaded)
+                Dispatcher.StartCoroutine(Loading());
+
+            if (loadState == LoadState.Unloading)
+                loadState = LoadState.Loading;
         }
 
-        /// <summary>
-        /// Load this Resource asynchronously.
-        /// </summary>
-        public void LoadAsync()
-        {
-            Dispatcher.instance.Enqueue(LoadAsyncCoroutine());
-        }
 
         /// <summary>
-        /// Coroutine that loads this Resource.
-        /// </summary>
-        public IEnumerator LoadCoroutine()
-        {
-            yield return _loadState.Load();
-        }
-
-        /// <summary>
-        /// Coroutine that loads this Resource asynchronously.
-        /// </summary>
-        public IEnumerator LoadAsyncCoroutine()
-        {
-            yield return _loadState.LoadAsync();
-        }
-
-        /// <summary>
-        /// Unload this Resource.
+        /// Unload this resource.
         /// </summary>
         public void Unload()
         {
-            _loadState.Unload();
+            if (loadState == LoadState.Loaded)
+                Dispatcher.StartCoroutine(Unloading());
+
+            if (loadState == LoadState.Loading)
+                loadState = LoadState.Unloading;
         }
 
-        /// <summary>
-        /// Finalize the current LoadState.
-        /// </summary>
-        protected void End()
+        private IEnumerator Loading()
         {
-            _loadState.End();
+            LogUtility.LogDebug("Loading " + name);
+
+            loadState = LoadState.Loading;
+
+            yield return LoadResources();
+
+            if (loadState == LoadState.Unloading)
+                yield return Unloading();
+            else
+            {
+                loadState = LoadState.Loaded;
+                progress = 1;
+                OnLoaded();
+            }
         }
 
-        /// <summary>
-        /// Use this to implement anything that should happen before unloading this Resource.
-        /// </summary>
-        protected virtual void PreUnLoadResources()
+        private IEnumerator Unloading()
         {
+            LogUtility.LogDebug("Unloading " + name);
 
+            loadState = LoadState.Unloading;
+
+            yield return UnloadResources();
+
+            if (loadState == LoadState.Loading)
+                yield return Loading();
+            else
+            {
+                loadState = LoadState.Unloaded;
+                progress = 0;
+                OnUnloaded();
+            }
         }
 
-        /// <summary>
-        /// Use this to implement unloading this Resource.
-        /// </summary>
-        protected abstract void UnloadResources();
-
-        /// <summary>
-        /// Use this to implement loading this Resource.
-        /// </summary>
-        protected abstract IEnumerator LoadResources();
-
-        /// <summary>
-        /// Use this to implement loading this Resource asynchronously.
-        /// </summary>
-        protected abstract IEnumerator LoadResourcesAsync();
-
-        /// <summary>
-        /// Handle end of loading.
-        /// </summary>
         protected virtual void OnLoaded()
         {
-            loadProgress = 1;
+            LogUtility.LogDebug("Loaded " + name);
+
             Loaded?.Invoke(this);
         }
 
-        /// <summary>
-        /// Handle end of unloading.
-        /// </summary>
         protected virtual void OnUnloaded()
         {
-            _loadProgress = 0;
+            LogUtility.LogDebug("Unloaded " + name);
+
             Unloaded?.Invoke(this);
         }
 
-        /// <summary>
-        /// Handle load cancelling.
-        /// </summary>
-        protected virtual void OnLoadCancelled()
+        protected void AddError(string message)
         {
-            LoadCancelled?.Invoke(this);
+            _errors.Add(message);
+        }
+
+        protected void AddErrors(IEnumerable<string> messages)
+        {
+            foreach (var message in messages)
+                AddError(message);
         }
 
         /// <summary>
-        /// Handle load resuming.
+        /// Use this to implement a process to load resources.
         /// </summary>
-        protected virtual void OnLoadResumed()
-        {
-            LoadResumed?.Invoke(this);
-        }
-        
-        private abstract class LoadState
-        {
-            protected Resource resource;
+        /// <returns></returns>
+        protected abstract IEnumerator LoadResources();
 
-            public virtual bool isBusy { get { return false; } }
-
-            public abstract ResourceLoadState loadState { get; }
-
-            protected LoadState(Resource resource)
-            {
-                this.resource = resource;
-            }
-
-            public virtual IEnumerator Load()
-            {
-                yield break;
-            }
-
-            public virtual IEnumerator LoadAsync()
-            {
-                yield break;
-            }
-
-            public virtual void Unload()
-            {
-
-            }
-
-            public virtual void End()
-            {
-
-            }
-        }
-
-        class UnloadedState : LoadState
-        {
-            public override ResourceLoadState loadState
-            {
-                get { return ResourceLoadState.Unloaded; }
-            }
-
-            public UnloadedState(Resource resource) : base(resource)
-            {
-
-            }
-
-            public override IEnumerator Load()
-            {
-                if (resource.canLoad)
-                {
-                    resource._loadState = new LoadingState(resource);
-                    yield return resource.LoadResources(); //TODO: this skips a frame
-                    resource.End();                    
-                }
-            }
-
-            public override IEnumerator LoadAsync()
-            {
-                if (resource.canLoad)
-                {
-                    resource._loadState = new LoadingState(resource);
-                    yield return resource.LoadResourcesAsync();
-                    resource.End();
-                }
-            }
-        }
-
-        class LoadingState : LoadState
-        {
-            public override bool isBusy
-            {
-                get { return true; }
-            }
-
-            public override ResourceLoadState loadState
-            {
-                get { return ResourceLoadState.Loading; }
-            }
-
-            public LoadingState(Resource resource) : base(resource)
-            {
-
-            }
-
-            public override void End()
-            {
-                resource._loadState = new LoadedState(resource);                
-                resource.OnLoaded();
-            }
-
-            public override void Unload()
-            {
-                resource._loadState = new CancellingState(resource);
-            }
-        }
-
-        class LoadedState : LoadState
-        {
-            public override ResourceLoadState loadState
-            {
-                get { return ResourceLoadState.Loaded; }
-            }
-
-            public LoadedState(Resource resource) : base(resource)
-            {
-
-            }
-
-            public override void Unload()
-            {
-                if (resource.isBusy)
-                {
-                    resource.PreUnLoadResources();
-                    resource._loadState = new UnloadingState(resource);
-                }
-                else
-                {
-                    resource.PreUnLoadResources();
-                    resource.UnloadResources();
-                    resource._loadState = new UnloadedState(resource);
-                    resource.OnUnloaded();
-                }
-            }
-        }
-
-        class CancellingState : LoadState
-        {
-            public override bool isBusy
-            {
-                get { return true; }
-            }
-
-            public override ResourceLoadState loadState
-            {
-                get { return ResourceLoadState.Cancelling; }
-            }
-
-            public CancellingState(Resource resource) : base(resource)
-            {
-
-            }
-
-            public override IEnumerator Load()
-            {               
-                resource.OnLoadResumed();
-                resource._loadState = new LoadingState(resource);
-                yield break;
-            }
-
-            public override IEnumerator LoadAsync()
-            {
-                resource.OnLoadResumed();
-                resource._loadState = new LoadingState(resource);
-                yield break;
-            }
-
-            public override void End()
-            {
-                resource._loadState = new UnloadedState(resource);     
-                resource.PreUnLoadResources();
-                resource.UnloadResources();
-                resource.OnLoadCancelled();
-            }
-        }
-
-        class UnloadingState : LoadState
-        {
-            public override bool isBusy
-            {
-                get { return true; }
-            }
-
-            public override ResourceLoadState loadState
-            {
-                get { return ResourceLoadState.Unloading; }
-            }
-
-            public UnloadingState(Resource resource) : base(resource)
-            {
-
-            }
-
-            public override IEnumerator Load()
-            {
-                resource._loadState = new LoadedState(resource);
-                resource.OnLoaded();
-                yield break;
-            }
-
-            public override IEnumerator LoadAsync()
-            {
-                resource._loadState = new LoadedState(resource);
-                resource.OnLoaded();
-                yield break;
-            }
-
-            public override void End()
-            {               
-                resource.PreUnLoadResources();
-                resource.UnloadResources();
-                resource._loadState = new UnloadedState(resource);
-                resource.OnUnloaded();
-            }
-        }
+        /// <summary>
+        /// Use this to implement a process to unload resources.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract IEnumerator UnloadResources();
     }
 }

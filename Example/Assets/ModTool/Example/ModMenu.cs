@@ -9,11 +9,7 @@ using ModTool;
 /// Example mod manager. This menu displays all mods and lets you enable/disable them.
 /// </summary>
 public class ModMenu : MonoBehaviour
-{
-    private ModManager modManager;
-    
-    private Dictionary<Mod, ModItem> modItems;
-
+{    
     /// <summary>
     /// The content panel where the menu items will be parented
     /// </summary>
@@ -30,6 +26,11 @@ public class ModMenu : MonoBehaviour
     public Button loadButton;
 
     /// <summary>
+    /// Dictionary linking mod menu items with mods
+    /// </summary>
+    private Dictionary<Mod, ModItem> modItems;
+
+    /// <summary>
     /// Are the enabled mods loaded?
     /// </summary>
     private bool isLoaded;
@@ -37,26 +38,28 @@ public class ModMenu : MonoBehaviour
     void Start()
     {
         modItems = new Dictionary<Mod, ModItem>();
+
+        //Subscribe to ModManager events for keeping track of found mods
+        ModManager.ModFound += OnModFound;
+        ModManager.ModRemoved += OnModRemoved;
+
+        //Subscribe to ModManager events to keep track of loaded mods
+        ModManager.ModLoaded += OnModLoaded;
+        ModManager.ModUnloaded += OnModUnloaded;
         
-        modManager = ModManager.instance;
+        //Refresh and look mods in mod search directories
+        ModManager.Refresh();
 
-        modManager.refreshInterval = 2;
+        //Start refreshing ModManager to look for changes every 2 seconds
+        StartCoroutine(AutoRefresh(2));
 
-        foreach (Mod mod in modManager.mods)
-            OnModFound(mod);
-
-        modManager.ModFound += OnModFound;
-        modManager.ModRemoved += OnModRemoved;
-        modManager.ModLoaded += OnModLoaded;
-        modManager.ModUnloaded += OnModUnloaded;
-        
         Application.runInBackground = true;        
     }
    
     private void OnModFound(Mod mod)
     {
-        ModItem modItem = Instantiate(modItemPrefab);
-        modItem.Initialize(mod, menuContentPanel);
+        ModItem modItem = Instantiate(modItemPrefab, menuContentPanel);
+        modItem.Initialize(mod);
         modItem.SetToggleInteractable(!isLoaded);
         modItems.Add(mod, modItem);
     }
@@ -81,7 +84,7 @@ public class ModMenu : MonoBehaviour
     }
 
     /// <summary>
-    /// Toggle load or unload all mods.
+    /// Toggle load or unload all enabled mods.
     /// </summary>
     public void LoadButton()
     {
@@ -95,13 +98,22 @@ public class ModMenu : MonoBehaviour
         }
     }
 
+    IEnumerator AutoRefresh(float seconds)
+    {
+        while(true)
+        {
+            ModManager.Refresh();
+            yield return new WaitForSeconds(seconds);
+        }
+    }
+
     private void Load()
     {
         //load mods
         foreach (Mod mod in modItems.Keys)
         {
             if(mod.isEnabled)
-                mod.LoadAsync();
+                mod.Load();
         }
 
         SetTogglesInteractable(false);
@@ -113,7 +125,7 @@ public class ModMenu : MonoBehaviour
 
     private void Unload()
     {   
-        //unload all mods - this will unload their scenes and destroy all their instantiated objects as well
+        //unload all mods - this will unload their scenes and destroy any associated objects
         foreach (Mod mod in modItems.Keys)
         {
             mod.Unload();
@@ -130,10 +142,11 @@ public class ModMenu : MonoBehaviour
     {
         Debug.Log("Loaded Mod: " + mod.name);
 
-        //load first scene when a mod is loaded
+        //load first scene (if present) when a mod is loaded
         ModScene scene = mod.scenes.FirstOrDefault();
+
         if (scene != null)
-            scene.LoadAsync();       
+            scene.Load();       
     }
 
     private void OnModUnloaded(Mod mod)

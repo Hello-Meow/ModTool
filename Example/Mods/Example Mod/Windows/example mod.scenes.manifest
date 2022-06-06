@@ -1,14 +1,52 @@
 ManifestFileVersion: 0
-CRC: 2350281609
+CRC: 197609472
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4538087aea1f07849650c3ba029257af
+    Hash: 420223cc7eb79cffb10f8c723a4e4b80
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 31d6cfe0d16ae931b73c59d7e0c089c0
+    Hash: 7566977d977821a2f22e8dcf53626c1d
 HashAppended: 0
-ClassTypes: []
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 20
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 64
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 81
+  Script: {instanceID: 0}
+- Class: 89
+  Script: {instanceID: 0}
+- Class: 104
+  Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 7dc07772f765d5940a941e577c49ec89, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 157
+  Script: {instanceID: 0}
+- Class: 258
+  Script: {instanceID: 0}
 Assets:
 - Assets/Example Mod-Scene.unity
 Dependencies: []

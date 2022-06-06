@@ -9,7 +9,7 @@ namespace ModTool
     /// <summary>
     /// Represents a directory that is monitored for Mods.
     /// </summary>
-    public class ModSearchDirectory : IDisposable
+    internal class ModSearchDirectory : IDisposable
     {
         /// <summary>
         /// Occurs when a new Mod has been found.
@@ -82,8 +82,6 @@ namespace ModTool
 
         private void DoRefresh()
         {
-            //LogUtility.LogDebug("Refreshing Mod search directory: " + path);
-
             bool changed = false;            
 
             string[] modInfoPaths = GetModInfoPaths();
@@ -196,6 +194,8 @@ namespace ModTool
             disposed = true;
             refreshEvent.Set();
             backgroundRefresh.Join();
+
+            refreshEvent.Dispose();
         }
     }
 }

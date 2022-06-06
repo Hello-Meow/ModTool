@@ -14,17 +14,12 @@ namespace ModTool.Shared
     public class LogUtility
     {
         /// <summary>
-        /// Which level of messages to log.
-        /// </summary>
-        public static LogLevel logLevel = LogLevel.Info;
-        
-        /// <summary>
         /// Log a debug message.
         /// </summary>
         /// <param name="message">The debug message.</param>
         public static void LogDebug(object message)
         {
-            if (logLevel >= LogLevel.Debug)
+            if (ModToolSettings.logLevel >= LogLevel.Debug)
                 Debug.Log(message);
         }
 
@@ -34,7 +29,7 @@ namespace ModTool.Shared
         /// <param name="message">The message.</param>
         public static void LogInfo(object message)
         {
-            if (logLevel >= LogLevel.Info)
+            if (ModToolSettings.logLevel >= LogLevel.Info)
                 Debug.Log(message);
         }
 
@@ -44,7 +39,7 @@ namespace ModTool.Shared
         /// <param name="message">The warning message.</param>
         public static void LogWarning(object message)
         {
-            if (logLevel >= LogLevel.Warning)
+            if (ModToolSettings.logLevel >= LogLevel.Warning)
                 Debug.LogWarning(message);
         }
 
@@ -54,7 +49,7 @@ namespace ModTool.Shared
         /// <param name="message">The error message</param>
         public static void LogError(object message)
         {
-            if (logLevel >= LogLevel.Error)
+            if (ModToolSettings.logLevel >= LogLevel.Error)
                 Debug.LogError(message);
         }
 
@@ -64,7 +59,7 @@ namespace ModTool.Shared
         /// <param name="exception">The exception</param>
         public static void LogException(Exception exception)
         {
-            if (logLevel >= LogLevel.Error)
+            if (ModToolSettings.logLevel >= LogLevel.Error)
                 Debug.LogException(exception);
         }
     }

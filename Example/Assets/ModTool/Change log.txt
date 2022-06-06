@@ -1,48 +1,13 @@
-Version 1.3.3
--added support for Assembly Definitions for API Assemblies
-
-Version 1.3.2
--added support for .NET Standard 2.0
--ignore Packages folder when finding assets for export
-
-Version 1.3.1:
--Fix for ModToolSettings not being updated with correct unityVersion and productName
-
-Version 1.3.0:
--Use ModToolSettings and CodeSettings directly instead of modifying ProductSettings for exporter
--Use Unity's builtin serialization instead of xml for ModInfo
--Refactored some messy parts
-
-Version 1.2.0:
--Added ModInfo.unityVersion to include which Unity version was used to export a mod
--Improved the mod exporter to be faster and more robust
--Added ModExporter.ExportStarting, an event that occurs before the export process starts
-
-Version 1.1.1:
--Added Unity 2017.2 support
-
-Version 1.1.0:
--Added ModManager.Refresh and ModManager.RefreshInterval to enable refreshing and auto refreshing of mods
--Added ModInfo.version and a version field for the mod exporter
--Removed Component constraint from GetComponent methods, so interfaces can be used as well
--Mods no longer have to be enabled to be loaded. Mod.isEnabled can be used as a convenient way to keep track of which mods the user wants to use
--Added support for ScriptableObject assets
--Added Mod.GetAsset methods for loading any asset type (support for including and exporting any asset type is planned)
--Renamed ModContent.Prefabs to Assets
--Renamed Mod.prefabPaths to assetPaths
--Added .Net 4.6 compatibility
--Fixed bug where code in coroutines wasn't verified
--Fixed bug where types from other Unity assemblies would be ignored by verification
-
-Version 1.0.2:
--Added loadProgress property and LoadProgress event for Mod and ModScene 
--Added null check and warning for uninitialized ModBehaviours
--Fix for rare circumstance where exporting would stop
--Save any unsaved scenes before exporting instead of only pre-existing unsaved scenes
--Prevent play mode when exporting
--Ignore unmanaged assemblies
--Fix for issue with scene names where path includes the scene name more than once
--Update mods collection after any potential modification to the collection
-
-Version 1.0.1:
--Small bug fix for package creation.
+Version 2.0:
+This version brings many breaking changes. Redundant features have been removed and most other features have been completely reworked.
+-Added shared assets
+-Added shared packages
+-Improved exporter creation
+-Improved mod export process
+-Improved mod object management
+-removed ModBehaviour and related classes
+-Simplified mod loading
+-Added Resource.errors
+-Removed API Assemblies
+-ModManager no longer refreshes by default
+-And more...

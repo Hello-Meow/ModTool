@@ -1,5 +1,4 @@
 ﻿using Mono.Cecil;
-using ModTool.Shared.Verification;
 using System;
 using System.IO;
 
@@ -11,7 +10,7 @@ namespace ModTool.Shared
     public static class EnumExtensions
     {
         /// <summary>
-        /// Unity's enum mask fields set all bits to 1. This sets all unused bits to 0, so it can be converted to a string and serialized properly.
+        /// Unity's enum mask fields sets all bits to 1. This sets all unused bits to 0, so it can be converted to a string and serialized properly.
         /// </summary>
         /// <param name="self">An enum instance.</param>
         /// <returns>A fixed enum.</returns>
@@ -37,42 +36,6 @@ namespace ModTool.Shared
     public static class StringExtensions
     {
         /// <summary>
-        /// Is this path a sub directory or the same directory of another path?
-        /// </summary>
-        /// <param name="self">A string.</param>
-        /// <param name="other">A path.</param>
-        /// <returns>True if this string is a sub directory or the same directory as the other.</returns>
-        public static bool IsDirectoryOrSubdirectory(this string self, string other)
-        {
-            var isChild = false;
-            try
-            {
-                var candidateInfo = new DirectoryInfo(self);
-                var otherInfo = new DirectoryInfo(other);
-
-                if (candidateInfo.FullName == otherInfo.FullName)
-                    return true;
-
-                while (candidateInfo.Parent != null)
-                {
-                    if (candidateInfo.Parent.FullName == otherInfo.FullName)
-                    {
-                        isChild = true;
-                        break;
-                    }
-                    else candidateInfo = candidateInfo.Parent;
-                }
-            }
-            catch (Exception e)
-            {
-                var message = String.Format("Unable to check directories {0} and {1}: {2}", self, other, e);
-                LogUtility.LogWarning(message);
-            }
-
-            return isChild;
-        }
-
-        /// <summary>
         /// Returns a normalized version of a path.
         /// </summary>
         /// <param name="self">A string.</param>
@@ -95,21 +58,9 @@ namespace ModTool.Shared
         /// Is this Type a subclass of the other Type?
         /// </summary>
         /// <param name="self">A TypeDefinition.</param>
-        /// <param name="other">A TypeDefinition.</param>
-        /// <returns>True if this TypeDefinition is a subclass of the other TypeDefinition.</returns>
-        public static bool IsSubClassOf(this TypeDefinition self, TypeName other)
-        {
-            return self.IsSubClassOf(other.nameSpace, other.name);
-        }
-
-        /// <summary>
-        /// Is this Type a subclass of the other Type?
-        /// </summary>
-        /// <param name="self">A TypeDefinition.</param>
-        /// <param name="namespace">A Type's namespace.</param>
-        /// <param name="name">A Type's name.</param>
+        /// <param name="typeName">A Type's full name.</param>
         /// <returns>True if this TypeDefinition is a subclass of the Type.</returns>
-        public static bool IsSubClassOf(this TypeDefinition self, string @namespace, string name)
+        public static bool IsSubClassOf(this TypeDefinition self, string typeName)
         {
             TypeDefinition type = self;
 
@@ -130,63 +81,41 @@ namespace ModTool.Shared
                 else
                     type = null;
 
-                if (type != null)
-                    if (type.Namespace == @namespace && type.Name == name)
-                        return true;
+                if (type?.GetFullName() == typeName)
+                    return true;                
             }
 
             return false;
         }
 
         /// <summary>
-        /// Get the first method that matches with methodName.
+        /// Get the Type's name including the Type's namespace.
         /// </summary>
-        /// <param name="self">A TypeDefinition.</param>
-        /// <param name="methodName">A method's name</param>
-        /// <returns>The MethodDefinition for the method, if found. Null otherwise.</returns>
-        public static MethodDefinition GetMethod(this TypeDefinition self, string methodName)
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static string GetFullName(this TypeReference self)
         {
-            foreach (MethodDefinition method in self.Methods)
-            {
-                if (method.Name == methodName)
-                    return method;
-            }
+            string fullName = self.Name;
 
-            return null;
+            if (string.IsNullOrEmpty(self.Namespace))
+                return fullName;
+
+            return self.Namespace + "." + fullName;
         }
 
         /// <summary>
-        /// Get the first field that matches with fieldName.
+        /// Get the Member's name including the declaring Type's full name.
         /// </summary>
-        /// <param name="self">A TypeDefinition.</param>
-        /// <param name="fieldName">The FieldDefinition for the field, if found. Null otherwise.</param>
-        /// <returns>The FieldDefinition, or null of none was found.</returns>
-        public static FieldDefinition GetField(this TypeDefinition self, string fieldName)
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static string GetFullName(this MemberReference self)
         {
-            foreach (FieldDefinition field in self.Fields)
-            {
-                if (field.Name == fieldName)
-                    return field;
-            }
+            string name = self.Name;
 
-            return null;
+            if (self.DeclaringType == null)
+                return name;
+
+            return self.DeclaringType.GetFullName() + "." + name;
         }
-
-        /// <summary>
-        /// Get the first property that matches with propertyName.
-        /// </summary>
-        /// <param name="self">A TypeDefinition.</param>
-        /// <param name="propertyName">The PropertyDefinition for the field, if found. Null otherwise.</param>
-        /// <returns>The PropertyDefinition, or null of none was found.</returns>
-        public static PropertyDefinition GetProperty(this TypeDefinition self, string propertyName)
-        {
-            foreach(PropertyDefinition property in self.Properties)
-            {
-                if (property.Name == propertyName)
-                    return property;
-            }
-
-            return null;
-        }  
     }
 }

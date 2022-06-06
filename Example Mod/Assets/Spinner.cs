@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using ModTool.Interface;
 
-public class Spinner : ModBehaviour
+public class Spinner : MonoBehaviour
 {
     public Vector3 speed;
 
