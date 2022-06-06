@@ -4,7 +4,7 @@
 
 ModTool makes it easy to add mod support to your project. It enables modders to use the Unity Editor to create scenes, prefabs and code and export them as mods for your game.
 
-See the included examples, the [Wiki](https://github.com/Hello-Meow/ModTool/wiki) or the [Documentation](http://hellomeow.net/modtool/documentation) for more info on how to use ModTool.
+See the included examples and the [Documentation](http://hellomeow.net/modtool/documentation) for more info on how to use ModTool.
 
 ## Features
 
