@@ -311,7 +311,7 @@ namespace ModTool.Editor.Exporting
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
 
-                if (path.Contains("/ModTool/") || path.Contains("/Editor/"))
+                if (path.Contains("/ModTool/") || path.Contains("/Editor/") || path.Contains("/External/"))
                     continue;
 
                 if (path.StartsWith("Packages"))
