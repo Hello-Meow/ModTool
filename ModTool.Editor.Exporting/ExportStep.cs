@@ -12,7 +12,6 @@ using ModTool.Shared.Verification;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using System.Text.RegularExpressions;
 
 namespace ModTool.Editor.Exporting
 {
@@ -331,6 +330,7 @@ namespace ModTool.Editor.Exporting
             return assets;
         }
 
+        //generate a hashset of assembly names that are from other mods
         private HashSet<string> FindIgnoredAssemblies()
         {
             List<Asset> assets = new List<Asset>();
