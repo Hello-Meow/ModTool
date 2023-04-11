@@ -12,6 +12,7 @@ using ModTool.Shared.Verification;
 
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Text.RegularExpressions;
 
 namespace ModTool.Editor.Exporting
 {
@@ -330,17 +331,46 @@ namespace ModTool.Editor.Exporting
             return assets;
         }
 
+        private HashSet<string> FindIgnoredAssemblies()
+        {
+            List<Asset> assets = new List<Asset>();
+
+            string[] guids = AssetDatabase.FindAssets("t:asmdef");
+
+            HashSet<string> ignoredAssemblies = new HashSet<string>();
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if(path.Contains("/External/"))
+                    ignoredAssemblies.Add(Path.GetFileNameWithoutExtension(path));
+            }
+
+            return ignoredAssemblies;
+        }
+
         private List<Asset> GetAssemblies()
         {
             List<Asset> assemblies = new List<Asset>();
 
-            foreach (string path in AssemblyUtility.GetAssemblies(assetsDirectory))
+            HashSet<string> ignoredSet = FindIgnoredAssemblies(); 
+
+            foreach (string path in AssemblyUtility.GetAssemblies(assetsDirectory, IsIgnored(ignoredSet, false)))
                 assemblies.Add(new Asset(path));
 
-            foreach (string path in AssemblyUtility.GetAssemblies(assemblyDirectory, IsModAssembly))
+            foreach (string path in AssemblyUtility.GetAssemblies(assemblyDirectory, IsIgnored(ignoredSet, true)))
                 assemblies.Add(new Asset(path));
-            
+
             return assemblies;
+        }
+
+        //generate a filter based on ignoredSet. if ignoredSet does not contain assembly name and it passes IsModAssembly, return true
+        private Func<string, bool> IsIgnored(HashSet<string> ignored, bool IsModAssemblyCheck)
+        {
+            if(IsModAssemblyCheck)
+                return assembly => !ignored.Contains(Path.GetFileNameWithoutExtension(assembly)) && IsModAssembly(assembly);
+            
+            return assembly => !ignored.Contains(Path.GetFileNameWithoutExtension(assembly));
         }
 
         private bool IsModAssembly(string assembly)
