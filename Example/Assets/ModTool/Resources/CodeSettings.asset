@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Name: CodeSettings
   m_EditorClassIdentifier: 
   _inheritanceRestrictions: []
-  _memberRestrictions: []
+  _memberRestrictions:
+  - message: 
+    targetType: 
+    restrictionMode: 0
+    member: 
   _typeRestrictions: []
   _namespaceRestrictions:
   - message: Reflection is not allowed.
