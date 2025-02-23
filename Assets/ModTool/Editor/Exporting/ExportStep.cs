@@ -80,7 +80,7 @@ namespace ModTool.Editor.Exporting
         private void VerifyProject()
         {
             if (!string.IsNullOrEmpty(ModToolSettings.unityVersion) && Application.unityVersion != ModToolSettings.unityVersion)
-                throw new Exception("Mods for " + ModToolSettings.productName + " can only be exported with Unity " + ModToolSettings.unityVersion);
+                LogUtility.LogWarning("Mods for " + ModToolSettings.productName + " should be exported with " + ModToolSettings.unityVersion + " for optimal compatibility.");
 
             if (Application.isPlaying)
                 throw new Exception("Unable to export mod in play mode");
