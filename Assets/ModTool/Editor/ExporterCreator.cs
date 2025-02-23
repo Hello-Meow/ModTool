@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using ModTool.Shared;
+using UnityEditorInternal;
+using System;
 
 namespace ModTool.Editor
 {
@@ -28,10 +30,10 @@ namespace ModTool.Editor
 
             CreateExporter(pathToBuiltProject);
         }
-        
+
         private static void CreateExporter(string path, bool revealPackage = false)
         {
-            LogUtility.LogInfo("Creating Exporter");
+            LogUtility.LogInfo("Creating Mod Exporter for " + ModToolSettings.productName);
 
             UpdateSettings();
 
@@ -39,7 +41,9 @@ namespace ModTool.Editor
             CodeSettings codeSettings = CodeSettings.instance;
 
             string modToolDirectory = GetModToolDirectory();
-            string exporterPath = Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Editor.Exporting.dll"));
+            string exporterPath = Path.Combine(modToolDirectory, Path.Combine("Editor", Path.Combine("Exporting", "ModTool.Editor.Exporting.asmdef")));
+
+
             string fileName = Path.Combine(path, Application.productName + " Mod Tools.unitypackage");
             string projectSettingsDirectory = "ProjectSettings";
 
@@ -47,59 +51,100 @@ namespace ModTool.Editor
             {
                 AssetDatabase.GetAssetPath(modToolSettings),
                 AssetDatabase.GetAssetPath(codeSettings),
-                Path.Combine(modToolDirectory, Path.Combine("Editor", "ModTool.Editor.Exporting.dll")),
-                Path.Combine(modToolDirectory, "ModTool.Shared.dll"),
-                Path.Combine(modToolDirectory, "ModTool.Shared.xml"),
-                Path.Combine(modToolDirectory, "ModTool.Interface.dll"),
-                Path.Combine(modToolDirectory, "ModTool.Interface.xml"),
-                Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "ModTool.Cecil.dll")),
-                Path.Combine(modToolDirectory, Path.Combine("Mono.Cecil", "LICENSE.txt")),
                 Path.Combine(projectSettingsDirectory, "EditorBuildSettings.asset"),
                 Path.Combine(projectSettingsDirectory, "InputManager.asset"),
                 Path.Combine(projectSettingsDirectory, "TagManager.asset"),
                 Path.Combine(projectSettingsDirectory, "Physics2DSettings.asset"),
-                Path.Combine(projectSettingsDirectory, "DynamicsManager.asset"),
+                Path.Combine(projectSettingsDirectory, "DynamicsManager.asset"),                
+                //TODO: include ProjectSettings.asset?
             };
+
+            string[] folders = new string[]
+            {
+                Path.Combine(modToolDirectory, Path.Combine("Scripts", "Shared")),
+                Path.Combine(modToolDirectory, Path.Combine("Scripts", "Interface")),                
+                Path.Combine(modToolDirectory, Path.Combine("Scripts", "Mono.Cecil")),
+                Path.Combine(modToolDirectory, Path.Combine("Editor", "Exporting")),
+                Path.Combine(modToolDirectory, "Resources"),
+            };
+
+            foreach (var folder in folders)
+                assetPaths.AddRange(GetAssetPaths(folder));
 
             assetPaths.AddRange(ModToolSettings.sharedAssets);
 
-            SetPluginEnabled(exporterPath, true);
+            //Note: Only enable exporter assembly definition for the exporter package.
+            SetAssemblyDefinitionEnabled(exporterPath, true);
 
             AssetDatabase.ExportPackage(assetPaths.ToArray(), fileName);
-                       
-            SetPluginEnabled(exporterPath, false);
 
-            if(revealPackage)
+            SetAssemblyDefinitionEnabled(exporterPath, false);
+
+            if (revealPackage)
                 EditorUtility.RevealInFinder(fileName);
         }
 
-        private static void SetPluginEnabled(string pluginPath, bool enabled)
+        private static string[] GetAssetPaths(string path, string filter = "*")
         {
-            PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
+            string[] guids = AssetDatabase.FindAssets(filter, new string[] { path });
 
-            if (pluginImporter.GetCompatibleWithEditor() == enabled)
-                return;
+            string[] assetPaths = new string[guids.Length];
 
-            pluginImporter.SetCompatibleWithEditor(enabled);
-            pluginImporter.SaveAndReimport();
+            for (int i = 0; i < guids.Length; i++)
+                assetPaths[i] = AssetDatabase.GUIDToAssetPath(guids[i]);
+
+            return assetPaths;
         }
-               
+
+        private static void SetAssemblyDefinitionEnabled(string path, bool enabled)
+        {
+            var asmDef = AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(path);
+
+            AssemblyData assemblyData = JsonUtility.FromJson<AssemblyData>(asmDef.text);
+
+            List<string> excludedPlatforms = new List<string>(assemblyData.excludePlatforms);
+
+            if (enabled)
+                excludedPlatforms.Remove("Editor");
+            else if (!excludedPlatforms.Contains("Editor"))
+                excludedPlatforms.Add("Editor");
+
+            assemblyData.excludePlatforms = excludedPlatforms.ToArray();
+
+            File.WriteAllText(path, JsonUtility.ToJson(assemblyData, true));
+
+            var asset = AssetImporter.GetAtPath(path);
+
+            asset.SaveAndReimport();
+        }
+
         private static void UpdateSettings()
         {
             if (string.IsNullOrEmpty(ModToolSettings.productName) || ModToolSettings.productName != Application.productName)
                 typeof(ModToolSettings).GetField("_productName", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.productName);
 
-            if (string.IsNullOrEmpty(ModToolSettings.unityVersion) || ModToolSettings.unityVersion != Application.unityVersion)            
+            if (string.IsNullOrEmpty(ModToolSettings.unityVersion) || ModToolSettings.unityVersion != Application.unityVersion)
                 typeof(ModToolSettings).GetField("_unityVersion", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(ModToolSettings.instance, Application.unityVersion);
 
             EditorUtility.SetDirty(ModToolSettings.instance);
         }
 
         private static string GetModToolDirectory()
-        {
-            string modToolDirectory = Path.GetDirectoryName(typeof(ModInfo).Assembly.Location);
+        {    
+            var guid = AssetDatabase.FindAssets("t:folder ModTool");
 
-            return modToolDirectory.Substring(Application.dataPath.Length - 6);
+            string modToolDirectory = AssetDatabase.GUIDToAssetPath(guid[0]);
+
+            return modToolDirectory;
+        }
+
+        [Serializable]
+        private class AssemblyData
+        {
+            public string name;
+            public string[] references;
+            public string[] includePlatforms;
+            public string[] excludePlatforms;
         }
     }
 }
