@@ -27,29 +27,19 @@ namespace ModTool.Shared
             switch (runtimePlatform)
             {
                 case RuntimePlatform.WindowsPlayer:
-                    if ((self & ModPlatform.Windows) == ModPlatform.Windows)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.Windows);
                 case RuntimePlatform.WindowsEditor:
-                    if ((self & ModPlatform.Windows) == ModPlatform.Windows)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.Windows);
                 case RuntimePlatform.LinuxPlayer:
-                    if ((self & ModPlatform.Linux) == ModPlatform.Linux)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.Linux);
+                case RuntimePlatform.LinuxEditor:
+                    return self.HasFlag(ModPlatform.Linux);
                 case RuntimePlatform.OSXPlayer:
-                    if ((self & ModPlatform.OSX) == ModPlatform.OSX)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.OSX);
                 case RuntimePlatform.OSXEditor:
-                    if ((self & ModPlatform.OSX) == ModPlatform.OSX)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.OSX);
                 case RuntimePlatform.Android:
-                    if ((self & ModPlatform.Android) == ModPlatform.Android)
-                        return true;
-                    break;
+                    return self.HasFlag(ModPlatform.Android);                    
             }
 
             return false;
@@ -69,6 +59,8 @@ namespace ModTool.Shared
                 case RuntimePlatform.WindowsEditor:
                     return ModPlatform.Windows;
                 case RuntimePlatform.LinuxPlayer:
+                    return ModPlatform.Linux;
+                case RuntimePlatform.LinuxEditor:
                     return ModPlatform.Linux;
                 case RuntimePlatform.OSXPlayer:
                     return ModPlatform.OSX;
