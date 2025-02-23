@@ -114,6 +114,8 @@ namespace ModTool
         /// <param name="path">The path of the search directory.</param>
         public static void RemoveSearchDirectory(string path)
         {
+            //TODO: what if search directory contains loaded mod?
+
             ModSearchDirectory directory = searchDirectories.Find(s => s.path.NormalizedPath() == path.NormalizedPath());
 
             if (directory == null)
