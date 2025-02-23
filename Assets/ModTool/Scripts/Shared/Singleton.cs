@@ -43,13 +43,10 @@ namespace ModTool.Shared
                     CreateAsset();
             }           
         }
-        
+ 
         private static void CreateAsset()
         {
-            string modToolDirectory = Path.GetDirectoryName(typeof(ModInfo).Assembly.Location);
-            string resourcesDirectory = Path.Combine(modToolDirectory, "Resources");
-
-            resourcesDirectory = resourcesDirectory.Substring(Application.dataPath.Length - 6);
+            string resourcesDirectory = GetResourcesDirectory();
 
             if (Directory.Exists(resourcesDirectory))
                 Directory.CreateDirectory(resourcesDirectory);
@@ -65,5 +62,19 @@ namespace ModTool.Shared
 
             method.Invoke(null, new object[] { _instance, assetPath });
         }
+
+        private static string GetResourcesDirectory()
+        {
+#if UNITY_EDITOR
+            var guid = UnityEditor.AssetDatabase.FindAssets("t:folder ModTool");
+
+            string modToolDirectory = UnityEditor.AssetDatabase.GUIDToAssetPath(guid[0]);
+
+            return Path.Combine(modToolDirectory, "Resources");
+#else
+            return "";
+#endif
+        }
+
     }
 }
