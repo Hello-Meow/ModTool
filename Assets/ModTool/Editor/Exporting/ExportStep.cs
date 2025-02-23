@@ -208,6 +208,9 @@ namespace ModTool.Editor.Exporting
                 if (!HasScripts(editorFolder) || HasAssemblyDefinition(editorFolder))
                     continue;
 
+                if (editorFolder.Contains("ModTool"))
+                    continue;
+
                 string name = editorFolder.Replace(Path.DirectorySeparatorChar, '-');
                 name = name.Replace(" ", "");
 
