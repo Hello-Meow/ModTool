@@ -1,0 +1,10 @@
+{
+    "name": "ModTool.Editor",
+    "references": [
+        "ModTool.Shared"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

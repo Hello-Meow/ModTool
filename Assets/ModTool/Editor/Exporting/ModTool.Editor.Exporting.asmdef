@@ -1,0 +1,29 @@
+{
+    "name": "ModTool.Editor.Exporting",
+    "references": [
+        "ModTool.Shared"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [
+        "Android",
+        "iOS",
+        "LinuxStandalone32",
+        "LinuxStandalone64",
+        "LinuxStandaloneUniversal",
+        "macOSStandalone",
+        "Nintendo3DS",
+        "PS4",
+        "PSMobile",
+        "PSVita",
+        "Switch",
+        "Tizen",
+        "tvOS",
+        "WebGL",
+        "WiiU",
+        "WindowsStandalone32",
+        "WindowsStandalone64",
+        "WSA",
+        "XboxOne",
+        "Editor"
+    ]
+}

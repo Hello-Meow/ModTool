@@ -1,0 +1,9 @@
+{
+    "name": "ModTool",
+    "references": [
+        "ModTool.Shared",
+        "ModTool.Interface"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
